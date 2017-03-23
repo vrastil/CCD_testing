@@ -119,6 +119,7 @@ class ImgInfo(object):
         self.run = ''
         self.test_type = ''
         self.img_type = ''
+        self.test_id = ''
         self.date = ''
         self.ccd_num = 0
 
@@ -129,7 +130,7 @@ class ImgInfo(object):
         for img in self.img:
             yield img
 
-    def __str__(self):
+    def __repr__(self):
         str_info = (
             "img_type = %s\ntest_type = %s\nrun = %s\ndate = %s" % (
                 self.img_type, self.test_type, self.run, self.date
@@ -140,13 +141,13 @@ class ImgInfo(object):
     def make_check(self, img):
         """ make check that all images have the same properties """
         check = True
-        check *= (img.run == self.run and img.test_type == self.test_type
-                  and img.img_type == self.img_type and img.date == self.date)
+        check *= (img.run == self.run and img.test_type == self.test_type and
+                  img.img_type == self.img_type and img.date == self.date)
         return check
 
-    def add_img(self, a_file):
+    def add_img(self, a_file_info):
         """ load one .fits file """
-        self.img.append(FileInfo(a_file))
+        self.img.append(a_file_info)
         if self.ccd_num == 0:
             self.run = self.img[0].run
             self.test_type = self.img[0].test_type
@@ -156,10 +157,13 @@ class ImgInfo(object):
         else:
             if self.make_check(self.img[self.ccd_num]):
                 self.ccd_num += 1
+                return True
             else:
-                print "WARNING! Incompatible images in class <ImgInfo>:\n%s\n\nand\n\n%s" % (
-                    self.img.pop(), self.__str__()
-                )
+                self.img.pop()
+                return False
+           #     print "WARNING! Incompatible images in class <ImgInfo>:\n%s\n\nand\n\n%s" % (
+           #         self.img.pop(), self.__str__()
+           #     )
 
 
 class RunInfo(object):
@@ -169,42 +173,35 @@ class RunInfo(object):
     def __init__(self, run_dir):
         self.run_dir = run_dir
         self.img_num = 0
-        self.img = []
+        self.img = {}
 
     def add_all_img(self):
         """ load all available images, i.e. all .fits files in run_dir """
         os.chdir(self.run_dir)
-        self.img = []
-        self.img_num = 0
-        img_num = 0
-
         all_files = [name[0] for name in get_files_in_traverse_dir(self.run_dir, '.fits')]
         all_files_info = [FileInfo(a_file) for a_file in all_files]
-        all_files_info = sorted(all_files_info, key=lambda f: f.date)
+        #all_files_info = sorted(all_files_info, key=lambda f: f.test_id)
 
-        for dir in _dev_index:
-            SUBDIR = 'S' + dir
-            if os.path.isdir(SUBDIR):
-                len_sdir = len(glob.glob(SUBDIR + '/*.fits'))
-                if img_num == 0:
-                    img_num = len_sdir
-                elif len_sdir < img_num:
-                    img_num = len_sdir  # if some directory contains fewer fits files
+        for file_info in all_files_info:
+            if file_info.date in self.img:
+                self.img[file_info.date].add_img(file_info)
+            else:
+                self.img[file_info.date] = ImgInfo()
+                self.img[file_info.date].add_img(file_info)
 
-        for i in range(img_num):
-            self.add_img()
-        self.img = sorted(self.img, key=lambda f: f[0].date)
+        self.img_num = len(self.img)
 
     def __getitem__(self, i):
-        return self.img[i]
+        return self.img.values()[i]
 
     def __iter__(self):
-        for img in self.img:
+        for img in self.img.values():
             yield img
 
     def __repr__(self):
-        str_repr = "Run_info < RUNDIR = '%s'; images =\n" % (self.RUN_DIR)
+        str_repr = "Run_info < RUNDIR = '%s'; images =\n" % (self.run_dir)
         for i in range(self.img_num):
-            str_repr += "%i: dev_type = %s, db = %s, run_type = %s, img = %s, run = %s, date = %s\n" % (
-                i, self.img[i][0].dev_type, self.img[i][0].db, self.img[i][0].run_type, self.img[i][0].img, self.img[i][0].run, self.img[i][0].date)
+            str_repr += "%i: test_type = %s, img_type = %s, date = %s\n" % (
+                i, self[i][0].test_type, self[i][0].img_type, self[i][0].date
+                )
         return str_repr
