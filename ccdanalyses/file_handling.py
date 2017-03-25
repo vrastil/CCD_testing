@@ -1,5 +1,4 @@
 import datetime
-import glob
 import os
 from astropy.io import fits
 
@@ -60,6 +59,7 @@ class FileInfo(object):
         self.img_type = header['IMGTYPE']
         self.date = datetime.datetime.strptime(
             header['DATE-OBS'], '%Y-%m-%dT%H:%M:%S.%f')
+        self.date_str = self.date.strftime('%Y%m%d_%H%M%S')
 
         fits_file.close()
 
@@ -97,11 +97,11 @@ class FileInfo(object):
         self.set_reb()
 
     def __repr__(self):
-        return "File_info < %s >" % self.file
+        return "FileInfo('%s')" % self.file
 
     def __str__(self):
         str_info = (
-            "file = %s\ndev_key = %s\ndev_name = %s\n"
+            "file = '%s'\ndev_key = %s\ndev_name = %s\n"
             "img_type = %s\ntest_type = %s\nrun = %s\ndate = %s" % (
                 self.file, self.dev_key, self.dev_name,
                 self.img_type, self.test_type, self.run, self.date
@@ -121,7 +121,9 @@ class ImgInfo(object):
         self.img_type = ''
         self.test_id = ''
         self.date = ''
+        self.date_str = ''
         self.ccd_num = 0
+        self.out_dir = ''
 
     def __getitem__(self, i):
         return self.img[i]
@@ -131,9 +133,12 @@ class ImgInfo(object):
             yield img
 
     def __repr__(self):
+        return "ImgInfo(%s, %s, %s, %s)" % (self.run, self.img_type, self.test_type, self.date)
+
+    def __str__(self):
         str_info = (
-            "img_type = %s\ntest_type = %s\nrun = %s\ndate = %s" % (
-                self.img_type, self.test_type, self.run, self.date
+            "ImgInfo():\nrun = %s\nimg_type = %s\ntest_type = %s\ndate = %s\nccd_num = %s\n" % (
+                self.run, self.img_type, self.test_type, self.date, self.ccd_num
             )
         )
         return str_info
@@ -153,17 +158,19 @@ class ImgInfo(object):
             self.test_type = self.img[0].test_type
             self.img_type = self.img[0].img_type
             self.date = self.img[0].date
+            self.date_str = self.img[0].date_str
             self.ccd_num += 1
+            self.out_dir = self.run + '/' + self.test_type + '_' + self.img_type + '/'
         else:
             if self.make_check(self.img[self.ccd_num]):
                 self.ccd_num += 1
                 return True
             else:
                 self.img.pop()
+                print "WARNING! Incompatible images in class <ImgInfo>:\n%s\n\nand\n\n%s" % (
+                    self.img.pop(), self.__str__()
+                )
                 return False
-           #     print "WARNING! Incompatible images in class <ImgInfo>:\n%s\n\nand\n\n%s" % (
-           #         self.img.pop(), self.__str__()
-           #     )
 
 
 class RunInfo(object):
@@ -172,24 +179,37 @@ class RunInfo(object):
 
     def __init__(self, run_dir):
         self.run_dir = run_dir
-        self.img_num = 0
+        self.img_num_all = 0
+        self.img_num = {}
+        self.run_num = 0
+        self.fl_num = 0
         self.img = {}
+        self.runs = {}
 
     def add_all_img(self):
         """ load all available images, i.e. all .fits files in run_dir """
         os.chdir(self.run_dir)
+#        print "Before loading files:\t", datetime.datetime.now()
         all_files = [name[0] for name in get_files_in_traverse_dir(self.run_dir, '.fits')]
         all_files_info = [FileInfo(a_file) for a_file in all_files]
-        #all_files_info = sorted(all_files_info, key=lambda f: f.test_id)
 
+ #       print "Before sorting files:\t", datetime.datetime.now()
         for file_info in all_files_info:
-            if file_info.date in self.img:
-                self.img[file_info.date].add_img(file_info)
-            else:
+            if file_info.date not in self.img:
                 self.img[file_info.date] = ImgInfo()
-                self.img[file_info.date].add_img(file_info)
+            self.img[file_info.date].add_img(file_info)
+  #      print "After sorting files:\t", datetime.datetime.now()
 
-        self.img_num = len(self.img)
+        for imgi in self.img.itervalues():
+            if imgi.out_dir not in self.runs:
+                self.runs[imgi.out_dir] = []
+                self.img_num[imgi.out_dir] = 0
+            self.runs[imgi.out_dir].append(imgi)
+            self.img_num[imgi.out_dir] += 1
+
+        self.img_num_all = len(self.img)
+        self.fl_num = len(all_files_info)
+        self.run_num = len(self.runs)
 
     def __getitem__(self, i):
         return self.img.values()[i]
@@ -199,9 +219,12 @@ class RunInfo(object):
             yield img
 
     def __repr__(self):
-        str_repr = "Run_info < RUNDIR = '%s'; images =\n" % (self.run_dir)
-        for i in range(self.img_num):
-            str_repr += "%i: test_type = %s, img_type = %s, date = %s\n" % (
-                i, self[i][0].test_type, self[i][0].img_type, self[i][0].date
+        return "Run_info('%s')" % (self.run_dir)
+
+    def __str__(self):
+        str_repr = "Run_info('%s'):\n" % (self.run_dir)
+        for key, run in self.runs.iteritems():
+            str_repr += "run = %s, test_type = %s, img_type = %s, images = %i\n" % (
+                run[0].run, run[0].test_type, run[0].img_type, self.img_num[key]
                 )
         return str_repr
