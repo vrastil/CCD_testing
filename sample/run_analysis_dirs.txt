@@ -1,0 +1,11 @@
+/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-004_ETU2-Dev/4720D/fe55_raft_analysis
+/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-004_ETU2-Dev/4722D/fe55_raft_analysis
+/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-004_ETU2-Dev/4723D/fe55_raft_analysis
+/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-004_ETU2-Dev/4724D/fe55_raft_analysis
+/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-004_ETU2-Dev/4727D/fe55_raft_analysis
+/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-004_ETU2-Dev/4728D/fe55_raft_analysis
+/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-004_ETU2-Dev/4729D/fe55_raft_analysis
+/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-004_ETU2-Dev/4729D/flat_pairs_raft_analysis
+/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-004_ETU2-Dev/4729D/qe_raft_analysis
+/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-004_ETU2-Dev/4733D/fe55_raft_analysis
+/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-004_ETU2-Dev/4749D/fe55_raft_analysis
