@@ -433,5 +433,5 @@ def plot_gains(gains, gain_ref, TITLES, OUT_DIR):
         ax2.hist(np.reshape(ratio, -1), 50, range=(0., 2.))
 
     fig.tight_layout()
-    plt.savefig(OUT_DIR + TITLE + '.png')
+    plt.savefig(OUT_DIR + '.png')
     plt.close(fig)
