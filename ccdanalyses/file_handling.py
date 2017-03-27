@@ -1,4 +1,5 @@
 import datetime
+import glob
 import os
 from astropy.io import fits
 
@@ -37,9 +38,6 @@ class FileInfo(object):
     """ Stores information about file and decipher file name:
     device, image number, time of image, etc """
 
-# head = h[0].header
-# date = head['DATE-OBS']
-# datetime.datetime.strptime(date, '%Y-%m-%dT%H:%M:%S.%f')
     dev_name = ""
 
     def load_file(self, a_file):
@@ -166,7 +164,7 @@ class ImgInfo(object):
                 self.ccd_num += 1
                 return True
             else:
-                self.img.pop()
+   #             self.img.pop()
                 print "WARNING! Incompatible images in class <ImgInfo>:\n%s\n\nand\n\n%s" % (
                     self.img.pop(), self.__str__()
                 )
@@ -228,3 +226,40 @@ class RunInfo(object):
                 run[0].run, run[0].test_type, run[0].img_type, self.img_num[key]
                 )
         return str_repr
+
+
+class GainInfo(object):
+    """ Class containg information about eotest fits file for the whole run"""
+
+    def __init__(self):
+        self.gain = []
+        self.gain_err = []
+        self.len = 0
+
+    def __getitem__(self, i):
+        return self.gain[i], self.gain_err[i]
+
+    def __iter__(self):
+        for g, gerr in self.gain, self.gain_err:
+            yield g, gerr
+
+    def __repr__(self):
+        return "GainInfo()"
+
+    def __str__(self):
+        return "GainInfo():\n%s" % self.gain
+
+    def add_gain(self, a_dir):
+        """ load all .fits file in dirs[] """
+
+        os.chdir(a_dir)
+        fl = sorted(glob.glob('*eotest*fits'))
+        for f in fl:
+            fits_file = fits.open(f)
+            header = fits_file[0].header
+            self.gain.append(fits_file[1].data['gain'])
+            self.gain_err.append(fits_file[1].data['gain_error'])
+            fits_file.close()
+
+        self.len = len(fl)
+        

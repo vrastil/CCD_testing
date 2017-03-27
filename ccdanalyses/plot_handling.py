@@ -408,3 +408,27 @@ def plot_cor_all(a, fl, TITLE, OUT_DIR):
     fig.suptitle("Overall correlations " + TITLE, y=0.91, size=20)
     plt.savefig(OUT_DIR + TITLE + '_cor_all.png')
     plt.close(fig)
+
+def plot_gain(gain, gain_ref, TITLE, OUT_DIR):
+    """ plot gain with respect to the reference gain """
+
+    ratio = np.array(gain.gain) / np.array(gain_ref.gain)
+
+    fig, axes = plt.subplots(nrows=2, ncols=3)
+    ax0, ax1, ax2, ax3, ax4, ax5 = axes.flatten()
+
+    ax0.hist(np.reshape(ratio,-1), 50, range=(0.9, 1.1), histtype='stepfilled', facecolor='green', alpha=0.75)
+    ax0.set_title('-65C/-102C')
+    ax3.hist(np.reshape(ratio,-1), 50, range=(0., 2.), histtype='stepfilled', facecolor='green', alpha=0.75)
+
+    ax1.hist(np.reshape(ratio,-1), 50, range=(0.9, 1.1), histtype='stepfilled', facecolor='blue')
+    ax1.set_title('-81C/-102C')
+    ax4.hist(np.reshape(ratio,-1), 50, range=(0., 2.), histtype='stepfilled', facecolor='blue')
+
+    ax2.hist(np.reshape(ratio,-1), 50, range=(0.9, 1.1), histtype='stepfilled', facecolor='red')
+    ax2.set_title('-82C/-102C')
+    ax5.hist(np.reshape(ratio,-1), 50, range=(0., 2.), histtype='stepfilled', facecolor='red')
+
+    fig.tight_layout()
+    plt.savefig(OUT_DIR + TITLE + '.png')
+    plt.close(fig)
