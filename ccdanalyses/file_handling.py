@@ -252,10 +252,10 @@ class GainInfo(object):
         return "GainInfo():\n%s" % self.gain
 
     def add_gain(self, a_dir):
-        """ load all .fits file in dirs[] """
+        """ load all '*eotest*fits' file in dirs[] """
 
-        os.chdir(a_dir)
-        fl = sorted(glob.glob('*eotest*fits'))
+        fl = get_files_in_traverse_dir(a_dir, '*eotest*fits')
+
         for f in fl:
             fits_file = fits.open(f)
             header = fits_file[0].header
