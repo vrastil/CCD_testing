@@ -409,25 +409,23 @@ def plot_cor_all(a, fl, TITLE, OUT_DIR):
     plt.savefig(OUT_DIR + TITLE + '_cor_all.png')
     plt.close(fig)
 
-def plot_gain(gain, gain_ref, TITLE, OUT_DIR):
-    """ plot gain with respect to the reference gain """
+def plot_gains(gains, gain_ref, TITLES, OUT_DIR):
+    """ plot gains with respect to the reference gain """
 
-    ratio = np.array(gain.gain) / np.array(gain_ref.gain)
+    ratios = []
+    for gain in gains:
+        ratios.append(np.array(gain.gain) / np.array(gain_ref.gain))
 
-    fig, axes = plt.subplots(nrows=2, ncols=3)
-    ax0, ax1, ax2, ax3, ax4, ax5 = axes.flatten()
+    rows = 2*((len(ratios) -1) / 6 + 1)
 
-    ax0.hist(np.reshape(ratio,-1), 50, range=(0.9, 1.1), histtype='stepfilled', facecolor='green', alpha=0.75)
-    ax0.set_title('-65C/-102C')
-    ax3.hist(np.reshape(ratio,-1), 50, range=(0., 2.), histtype='stepfilled', facecolor='green', alpha=0.75)
-
-    ax1.hist(np.reshape(ratio,-1), 50, range=(0.9, 1.1), histtype='stepfilled', facecolor='blue')
-    ax1.set_title('-81C/-102C')
-    ax4.hist(np.reshape(ratio,-1), 50, range=(0., 2.), histtype='stepfilled', facecolor='blue')
-
-    ax2.hist(np.reshape(ratio,-1), 50, range=(0.9, 1.1), histtype='stepfilled', facecolor='red')
-    ax2.set_title('-82C/-102C')
-    ax5.hist(np.reshape(ratio,-1), 50, range=(0., 2.), histtype='stepfilled', facecolor='red')
+    fig, axes = plt.subplots(nrows=rows, ncols=6)
+    axfl = axes.flatten()
+    for i, ratio in enumerate(ratios):
+        ax = axfl[2*i]
+        ax2 = axfl[2*i+1]
+        ax.hist(np.reshape(ratio, -1), 50, range=(0.9, 1.1))
+        ax.set_title(TITLES[i])
+        ax2.hist(np.reshape(ratio, -1), 50, range=(0., 2.))
 
     fig.tight_layout()
     plt.savefig(OUT_DIR + TITLE + '.png')
