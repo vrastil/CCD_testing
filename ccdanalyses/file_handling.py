@@ -257,7 +257,7 @@ class GainInfo(object):
         fl = get_files_in_traverse_dir(a_dir, '*eotest*fits')
 
         for f in fl:
-            fits_file = fits.open(f)
+            fits_file = fits.open(f[0])
             header = fits_file[0].header
             self.gain.append(fits_file[1].data['gain'])
             self.gain_err.append(fits_file[1].data['gain_error'])
