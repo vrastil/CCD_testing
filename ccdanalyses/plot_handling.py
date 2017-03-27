@@ -412,9 +412,14 @@ def plot_cor_all(a, fl, TITLE, OUT_DIR):
 def plot_gains(gains, gain_ref, TITLES, OUT_DIR):
     """ plot gains with respect to the reference gain """
 
+    gain_ref_np = np.array(gain_ref.gain)
     ratios = []
     for gain in gains:
-        ratios.append(np.array(gain.gain) / np.array(gain_ref.gain))
+        gain_np = np.array(gain.gain)
+        dim = (min(gain_ref_np.shape[0], gain_np.shape[0]),
+               min(gain_ref_np.shape[1], gain_np.shape[1])
+              )
+        ratios.append(gain_np[0:dim[0], 0:dim[1]] / gain_ref_np[0:dim[0], 0:dim[1]])
 
     rows = 2*((len(ratios) -1) / 6 + 1)
 
