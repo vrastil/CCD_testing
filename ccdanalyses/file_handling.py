@@ -1,5 +1,6 @@
 import datetime
 import glob
+import fnmatch
 import os
 from astropy.io import fits
 
@@ -17,12 +18,13 @@ _DEV_INDEX_TR = ['22', '21', '20', '12', '11', '10', '02', '01', '00']
 
 def get_files_in_traverse_dir(a_dir, a_file):
     """ return list of all files in directory and its subdirectories \
-    which matches 'a_file' and its subdirectory path """
+    which matches 'a_file' and its subdirectory path, support Unix \
+    filename pattern matching ('*', '?', [seq], [!seq]) """
 
     ls_file = []
     for root, dirs, files in os.walk(a_dir):
         for name in files:
-            if name.endswith(a_file):
+            if fnmatch.fnmatch(name, a_file):
                 subdir = root.replace(a_dir, '')
                 ls_file.append((os.path.join(root, name), subdir))
     return ls_file
