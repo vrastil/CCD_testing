@@ -410,28 +410,40 @@ def plot_cor_all(a, fl, TITLE, OUT_DIR):
     plt.close(fig)
 
 def plot_gains(gains, gain_ref, TITLES, OUT_DIR):
-    """ plot gains with respect to the reference gain """
+    """ plot gains with respect to the reference gain,
+    whre reference gain is number => gains[gain_ref]"""
 
-    gain_ref_np = np.array(gain_ref.gain)
+#    print 'directory: %s' % OUT_DIR
+#    print 'TITLES:%s', TITLES
+
+    gain_ref_np = np.array(gains[gain_ref].gain)
     ratios = []
     for gain in gains:
         gain_np = np.array(gain.gain)
         dim = (min(gain_ref_np.shape[0], gain_np.shape[0]),
                min(gain_ref_np.shape[1], gain_np.shape[1])
               )
+#        print 'dim = ', dim
         ratios.append(gain_np[0:dim[0], 0:dim[1]] / gain_ref_np[0:dim[0], 0:dim[1]])
 
-    rows = 2*((len(ratios) -1) / 6 + 1)
+#    print 'Ratios = ', ratios
 
+    rows = 2*((len(ratios) -1) / 6 + 1)
+    cmap = plt.get_cmap('gnuplot')
+    colors = [cmap(i) for i in np.linspace(0, 1, len(ratios))]
     fig, axes = plt.subplots(nrows=rows, ncols=6)
+    fig.set_size_inches(20,20)
     axfl = axes.flatten()
     for i, ratio in enumerate(ratios):
-        ax = axfl[2*i]
-        ax2 = axfl[2*i+1]
-        ax.hist(np.reshape(ratio, -1), 50, range=(0.9, 1.1))
-        ax.set_title(TITLES[i])
-        ax2.hist(np.reshape(ratio, -1), 50, range=(0., 2.))
+#        print 'Plotting %s', TITLES[i]
+	j = (i / 6)*12 + i % 6
+        ax = axfl[j]
+        ax2 = axfl[j+6]
+        ax.hist(np.reshape(ratio, -1), 20, range=(0.9, 1.1), facecolor=colors[i])
+        ax.set_title(TITLES[i], size=20)
+        ax2.hist(np.reshape(ratio, -1), 50, range=(0., 2.), facecolor=colors[i])
 
-    fig.tight_layout()
-    plt.savefig(OUT_DIR + '.png')
+    fig.suptitle("Gains with ref gain '%s'" % TITLES[gain_ref],  y=0.95, size=25)
+ #   fig.tight_layout()
+    plt.savefig(OUT_DIR + 'gain.png')
     plt.close(fig)
