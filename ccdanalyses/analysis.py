@@ -94,10 +94,11 @@ def compare_runs(OUT_DIR='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/N
     f_hist = open(OUT_DIR + 'runs_summary.dat', 'w')
     for i, run in enumerate(x_run):
         try:
-            str = run
+            line = run
  #           print '%i\t%s' %(i, run)
-            for data in y_stat[i]: str+= "\t%f" % data
-            f_hist.write(str+'\n')
+            for data in y_stat[i]:
+                line += "\t%f" % data
+            f_hist.write(line+'\n')
         except:
             print "Unexpected error:", sys.exc_info()[0]
             print "Ommiting run '%s'" % run

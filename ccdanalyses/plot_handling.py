@@ -338,7 +338,7 @@ def plot_summary(data, run, OUT_DIR, SUPTITLE="Runs comparison"):
     ax3.set_ylim([0, 75])
     ax3.legend(numpoints=1)
 
-    plt.xticks(x, run, rotation=30)
+    plt.xticks(x, run, rotation=60)
     fig.suptitle(SUPTITLE, y=0.96, size=20)
     plt.subplots_adjust(hspace=0.0, bottom=0.15, left=0.05)
 
