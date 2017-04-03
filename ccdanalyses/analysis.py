@@ -1,5 +1,5 @@
 
-import os
+import os, sys
 import random
 import numpy as np
 
@@ -81,14 +81,27 @@ def compare_runs(OUT_DIR='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/N
     y_stat = []
 
     print 'Averaging individual runs...'
-#	for sub_dir in SUB_DIR:
     for file_, run in fh.get_files_in_traverse_dir(OUT_DIR, 'hist_summary.dat'):
+#        print "File: %s, run: %s\n" % (file_, run)
         data = np.loadtxt(file_, usecols=range(1, 10))
-        data = np.mean(data, 0)
+        if data.size != 9:
+            data = np.mean(data, 0)
         x_run.append(run)
         y_stat.append(data)
 
     y_stat = np.array(y_stat)
-    print "Creating summary plot..."
+    print "Creating summary file and plot..."
+    f_hist = open(OUT_DIR + 'runs_summary.dat', 'w')
+    for i, run in enumerate(x_run):
+        try:
+            str = run
+ #           print '%i\t%s' %(i, run)
+            for data in y_stat[i]: str+= "\t%f" % data
+            f_hist.write(str+'\n')
+        except:
+            print "Unexpected error:", sys.exc_info()[0]
+            print "Ommiting run '%s'" % run
+
+    f_hist.close()
     ph.plot_summary(y_stat, x_run, OUT_DIR)
     print "Everything done!"
