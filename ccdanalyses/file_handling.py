@@ -36,6 +36,14 @@ def get_immediate_subdirectories(a_dir):
             if os.path.isdir(os.path.join(a_dir, name))]
 
 
+def load_runs(a_file):
+    """ from a file containing analysis directories return their paths in a list """
+    o_file = open(a_file, 'r')
+    tmp = o_file.read().splitlines()
+    o_file.close()
+    return tmp
+
+
 class FileInfo(object):
     """ Stores information about file and decipher file name:
     device, image number, time of image, etc """
