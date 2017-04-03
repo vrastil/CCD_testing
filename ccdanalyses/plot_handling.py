@@ -309,7 +309,7 @@ def plot_histogram_all_one_binning(m, n, nd, TITLE, OUT_DIR, bin_num=45,
 
 def plot_summary(data, run, OUT_DIR, SUPTITLE="Runs comparison"):
     cols = len(data)
-    fig = plt.figure(figsize=(20, 6))
+    fig = plt.figure(figsize=(20, 9))
     x = range(cols)
 
     ax1 = plt.subplot(3, 1, 1)
@@ -338,9 +338,9 @@ def plot_summary(data, run, OUT_DIR, SUPTITLE="Runs comparison"):
     ax3.set_ylim([0, 75])
     ax3.legend(numpoints=1)
 
-    plt.xticks(x, run, rotation=60)
+    plt.xticks(x, run, rotation=45, ha='right')
     fig.suptitle(SUPTITLE, y=0.96, size=20)
-    plt.subplots_adjust(hspace=0.0, bottom=0.15, left=0.05)
+    plt.subplots_adjust(hspace=0.0, bottom=0.20, left=0.05)
 
     plt.savefig(OUT_DIR + 'Runs_summary.png')
     plt.close(fig)

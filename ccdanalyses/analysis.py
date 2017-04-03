@@ -86,7 +86,7 @@ def compare_runs(OUT_DIR='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/N
         data = np.loadtxt(file_, usecols=range(1, 10))
         if data.size != 9:
             data = np.mean(data, 0)
-        x_run.append(run)
+        x_run.append(run.replace('_', ' '))
         y_stat.append(data)
 
     y_stat = np.array(y_stat)
