@@ -1,0 +1,9 @@
+executing on host: astro0003 with pid: 19555
+tcgetattr: Inappropriate ioctl for device
+Bad : modifier in $ (/).
+Connection to astro0003 closed.
+export PYTHONPATH=$PYTHONPATH:/direct/astro+u/vrastil/CCD_testing/CCD_testing
+setenv WD '/direct/astro+u/vrastil/CCD_testing/CCD_testing/sample'
+cd $WD
+python noise_studies.py > job.log
+

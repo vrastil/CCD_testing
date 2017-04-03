@@ -190,7 +190,7 @@ class RunInfo(object):
         """ load all available images, i.e. all .fits files in run_dir """
         os.chdir(self.run_dir)
 #        print "Before loading files:\t", datetime.datetime.now()
-        all_files = [name[0] for name in get_files_in_traverse_dir(self.run_dir, '.fits')]
+        all_files = [name[0] for name in get_files_in_traverse_dir(self.run_dir, '*.fits')]
         all_files_info = [FileInfo(a_file) for a_file in all_files]
 
  #       print "Before sorting files:\t", datetime.datetime.now()

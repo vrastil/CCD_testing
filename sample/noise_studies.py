@@ -2,9 +2,18 @@
 
 from ccdanalyses.analysis import analyze_run
 
+
+def load_runs(a_file):
+    """ from a file containing analysis directories return their paths in a list """
+    o_file = open(a_file, 'r')
+    tmp = o_file.read().splitlines()
+    o_file.close()
+    return tmp
+
 # RUN_DIR: directory of run to be proccesed, this directory must contain subdirectories such as S22/, S21, etc. (arbitrary number of CCDs)
 
-RUN_DIRs = []
+RUN_DIRs = load_runs('/direct/astro+u/vrastil/CCD_testing/CCD_testing/sample/new_runs.txt')
+
 #RUN_DIRs.append('/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-004_ETU2-Dev/4696D/fe55_raft_acq/v0/26874/')
 #RUN_DIRs.append('/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-004_ETU2-Dev/4697D/fe55_raft_acq/v0/26885/')
 #RUN_DIRs.append('/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-004_ETU2-Dev/4698D/fe55_raft_acq/v0/26896/')
@@ -30,13 +39,12 @@ RUN_DIRs = []
 #RUN_DIRs.append('/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-004_ETU2-Dev/4723D/fe55_raft_acq/v0/27180/')
 #RUN_DIRs.append('/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-004_ETU2-Dev/4724D/fe55_raft_acq/v0/27190/')
 #RUN_DIRs.append('/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-004_ETU2-Dev/4727D/fe55_raft_acq/v0/27208/')
-RUN_DIRs.append('/home/vrastil/Downloads/ITL-3800C-145-Dev_fe55_bias_000_4728D_20170317204644.fits')
 
 # OUT_DIR: if you are processing new whole run, can be keept pointing to the web address, can be changed to arbitrary output directory otherwise
-# OUT_DIR = '/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/Noise_studies/'
-OUT_DIR = '/home/vrastil/Documents/Brookhaven/scripts/output/'
+OUT_DIR = '/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/Noise_studies/'
+# OUT_DIR = '/home/vrastil/Documents/Brookhaven/scripts/output/'
 # NUM_IMG : number of images to be processed, set 0 for all available
-NUM_IMG = 1
+NUM_IMG = 3
 
 # omit_REBs : list of REBs not included in computation of statistic, usually REBs which are not clocking
 omit_REBs = []
