@@ -17,7 +17,7 @@ for run in RUNS:
         i += 1
         TITLES.append(run.split("/")[-2])
 
-for i in len(GAININFO):
+for i in xrange(len(GAININFO)):
     print TITLES[i], ':', GAININFO[i]
 
 #    plot_gain(GAININFO[1], GAININFO[0], 'Gain', OUT)
