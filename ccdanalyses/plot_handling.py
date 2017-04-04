@@ -457,9 +457,9 @@ def plot_raft_map(data, img, TITLE, OUTDIR):
         x = (fli.dev_index / 3) * 2 # [0, 2, 4]
         y = (fli.dev_index % 3) * 8 # [0, 8, 16]
         for j in range(16):
-            x += j / 8 # [0, 1,..., 5]
-            y += j % 8 # [0, 1,..., 23]
-            map[x, y] = data[i, j]
+            xx = x + j / 8 # [0, 1,..., 5]
+            yy = y + j % 8 # [0, 1,..., 23]
+            map[xx, yy] = data[i, j]
 
     fig = plt.figure(figsize=(15, 15))
     im = plt.imshow(mapRaft, interpolation='nearest', cmap='jet', aspect=4)
