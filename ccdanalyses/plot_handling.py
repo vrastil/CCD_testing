@@ -466,5 +466,5 @@ def plot_raft_map(data, img, TITLE, OUTDIR):
     im = plt.imshow(map, interpolation='nearest', cmap='jet', aspect=4)
     fig.colorbar(im, cax=cbar_ax)
     fig.suptitle(TITLE, y=0.93, size=20)
-    plt.savefig(OUT_DIR + TITLE + '.png')
+    plt.savefig(OUTDIR + TITLE + '.png')
     plt.close(fig)
