@@ -467,6 +467,6 @@ def plot_raft_map(data, img, TITLE, OUTDIR):
     #fig.colorbar(im, cax=cbar_ax)
     fig.colorbar(im)
     #fig.suptitle(TITLE, y=0.93, size=20)
-    ig.suptitle(TITLE)
+    fig.suptitle(TITLE)
     plt.savefig(OUTDIR + TITLE + '.png')
     plt.close(fig)
