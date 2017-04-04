@@ -461,10 +461,12 @@ def plot_raft_map(data, img, TITLE, OUTDIR):
             yy = y + j % 8 # [0, 1,..., 23]
             map[xx, yy] = data[i, j]
 
-    fig = plt.figure(figsize=(15, 15))
-    cbar_ax = fig.add_axes([0.85, 0.137, 0.05, 0.73])
+    fig = plt.figure(figsize=(10, 10))
+    #cbar_ax = fig.add_axes([0.85, 0.137, 0.05, 0.73])
     im = plt.imshow(map, interpolation='nearest', cmap='jet', aspect=4)
-    fig.colorbar(im, cax=cbar_ax)
-    fig.suptitle(TITLE, y=0.93, size=20)
+    #fig.colorbar(im, cax=cbar_ax)
+    fig.colorbar(im)
+    #fig.suptitle(TITLE, y=0.93, size=20)
+    ig.suptitle(TITLE)
     plt.savefig(OUTDIR + TITLE + '.png')
     plt.close(fig)
