@@ -447,3 +447,23 @@ def plot_gains(gains, gain_ref, TITLES, OUT_DIR):
  #   fig.tight_layout()
     plt.savefig(OUT_DIR + 'gain.png')
     plt.close(fig)
+
+def plot_raft_map(data, img, TITLE, OUTDIR):
+    """ create a raft map 6x24 for data in CCDsx16 array """
+
+    map = np.zeros((6, 24))
+
+    for i, fli in enumerate(img):
+        x = (fli.dev_index / 3) * 2 # [0, 2, 4]
+        y = (fli.dev_index % 3) * 8 # [0, 8, 16]
+        for j in range(16):
+            x += j / 8 # [0, 1,..., 5]
+            y += j % 8 # [0, 1,..., 23]
+            map[x, y] = data[i, j]
+
+    fig = plt.figure(figsize=(15, 15))
+    im = plt.imshow(mapRaft, interpolation='nearest', cmap='jet', aspect=4)
+    fig.colorbar(im, cax=cbar_ax)
+    fig.suptitle(TITLE, y=0.93, size=20)
+    plt.savefig(OUT_DIR + TITLE + '.png')
+    plt.close(fig)
