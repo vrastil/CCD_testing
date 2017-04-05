@@ -468,5 +468,6 @@ def plot_raft_map(data, img, TITLE, OUTDIR):
     fig.colorbar(im)
     #fig.suptitle(TITLE, y=0.93, size=20)
     fig.suptitle(TITLE)
-    plt.savefig(OUTDIR + TITLE + '.png')
+    plt.savefig(OUTDIR + TITLE + '_map.png')
+    plt.show()
     plt.close(fig)
