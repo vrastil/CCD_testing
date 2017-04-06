@@ -26,9 +26,20 @@ def analyze_single_img(img, out_dir, omit_rebs=[]):
 
     title = img.run + '_' + img.date_str
     bin_num = (45 * img.ccd_num) / 9
+    # data
     mean, noise, dnoise, overscan = dh.make_tab_all(img)
     corcoef = dh.make_tab_corcoef_from_fl(img)
+    # save data
+    data, names = (mean, noise, dnoise, overscan, corcoef), ("mean", "noise", "dnoise", "overscan", "corcoef")
+    if not os.path.exists(out_dir+'data/'):
+        print "Creating outdir '%s'" % (out_dir + 'data/')
+        os.makedirs(out_dir+'data/')
 
+    for i, dat in enumerate(data):
+        nam = names[i]
+        np.save(out_dir+'data/%s' % nam, dat)
+
+    # plot data
     ph.plot_overscan(overscan, img, title, out_dir)
     ph.plot_overscan_diff(overscan, img, title, out_dir)
     ph.plot_mean_std_stddelta(mean, noise, dnoise, img, title, out_dir)
