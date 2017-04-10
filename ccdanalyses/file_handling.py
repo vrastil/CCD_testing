@@ -89,6 +89,10 @@ class FileInfo(object):
             self.date = datetime.datetime.strptime(
                 header['DATE-OBS'], '%Y-%m-%dT%H:%M:%S.%f')
             self.date_str = self.date.strftime('%Y%m%d_%H%M%S')
+        elif 'DATE' in header:
+            self.date = datetime.datetime.strptime(
+                header['DATE'], '%Y-%m-%dT%H:%M:%S.%f')
+            self.date_str = self.date.strftime('%Y%m%d_%H%M%S')
         else:
             print 'ERROR! Wrong format of header, file "%s"' % self.file
 
