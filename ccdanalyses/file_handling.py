@@ -87,7 +87,7 @@ class FileInfo(object):
 
         if 'DATE-OBS' in header:
             self.date = datetime.datetime.strptime(
-            header['DATE-OBS'], '%Y-%m-%dT%H:%M:%S.%f')
+                header['DATE-OBS'], '%Y-%m-%dT%H:%M:%S.%f')
             self.date_str = self.date.strftime('%Y%m%d_%H%M%S')
         else:
             print 'ERROR! Wrong format of header, file "%s"' % self.file
@@ -99,7 +99,7 @@ class FileInfo(object):
         if self.dev_key in _DEV:
             self.dev_name = _DEV[self.dev_key]
         else:
-            print 'ERROR! Unknown dev_key "%s", file "%s"' % (self.dev_key self.file)
+            print 'ERROR! Unknown dev_key "%s", file "%s"' % (self.dev_key, self.file)
 
     def set_index(self):
         """ set index of CCD for sorting purposes """
@@ -108,7 +108,7 @@ class FileInfo(object):
     def set_index_tr(self):
         """ set index of CCD for sorting purposes """
         self.dev_index_tr = _DEV_INDEX_TR.index(self.dev_name)
-        
+
     def set_reb(self):
         """ set REB number """
         reb = self.dev_name[0:1]
