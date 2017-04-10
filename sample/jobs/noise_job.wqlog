@@ -1,21 +1,9 @@
-executing on host: astro0028 with pid: 4279
+executing on host: astro0028 with pid: 9263
 tcgetattr: Inappropriate ioctl for device
 Bad : modifier in $ (/).
-Traceback (most recent call last):
-  File "noise_studies.py", line 55, in <module>
-    analyze_run(RUN_DIR, OUT_DIR, NUM_IMG, omit_REBs)
-  File "/direct/astro+u/vrastil/CCD_testing/CCD_testing/ccdanalyses/analysis.py", line 58, in analyze_run
-    run.add_all_img()
-  File "/direct/astro+u/vrastil/CCD_testing/CCD_testing/ccdanalyses/file_handling.py", line 202, in add_all_img
-    all_files_info = [FileInfo(a_file) for a_file in all_files]
-  File "/direct/astro+u/vrastil/CCD_testing/CCD_testing/ccdanalyses/file_handling.py", line 105, in __init__
-    self.set_reb()
-  File "/direct/astro+u/vrastil/CCD_testing/CCD_testing/ccdanalyses/file_handling.py", line 98, in set_reb
-    self.reb = int(reb)
-ValueError: invalid literal for int() with base 10: ''
 Connection to astro0028 closed.
 export PYTHONPATH=$PYTHONPATH:/direct/astro+u/vrastil/CCD_testing/CCD_testing
 setenv WD '/direct/astro+u/vrastil/CCD_testing/CCD_testing/sample'
 cd $WD
-python noise_studies.py > job.log
+python noise_studies.py > jobs/job.log
 
