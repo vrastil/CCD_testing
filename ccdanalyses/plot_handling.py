@@ -448,7 +448,7 @@ def plot_gains(gains, gain_ref, TITLES, OUT_DIR):
     plt.savefig(OUT_DIR + 'gain.png')
     plt.close(fig)
 
-def plot_raft_map(data, img, TITLE, OUTDIR):
+def plot_raft_map(data, img, TITLE, OUTDIR, vmin=None, vmax=None):
     """ create a raft map 6x24 for data in CCDsx16 array """
 
     map = np.zeros((6, 24))
@@ -463,7 +463,7 @@ def plot_raft_map(data, img, TITLE, OUTDIR):
 
     fig = plt.figure(figsize=(10, 10))
     #cbar_ax = fig.add_axes([0.85, 0.137, 0.05, 0.73])
-    im = plt.imshow(map, interpolation='nearest', cmap='jet', aspect=4)
+    im = plt.imshow(map, interpolation='nearest', cmap='jet', aspect=4, vmin=vmin, vmax=vmax)
     #fig.colorbar(im, cax=cbar_ax)
     fig.colorbar(im)
     fig.suptitle(TITLE, y=0.87, size=19)
