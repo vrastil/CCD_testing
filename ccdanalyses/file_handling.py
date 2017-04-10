@@ -64,13 +64,33 @@ class FileInfo(object):
         header = fits_file[0].header
 
         self.file = a_file
-        self.run = header['RUNNUM']
-        self.dev_key = (header['LSST_NUM'])[10:13]
-        self.test_type = header['TESTTYPE']
-        self.img_type = header['IMGTYPE']
-        self.date = datetime.datetime.strptime(
+
+        if 'RUNNUM' in header:
+            self.run = header['RUNNUM']
+        else:
+            self.run = 'UNKNOWN'
+
+        if 'LSST_NUM' in header:
+            self.dev_key = (header['LSST_NUM'])[10:13]
+        else:
+            print 'ERROR! Wrong format of header, file "%s"' % self.file
+
+        if 'TESTTYPE' in header:
+            self.test_type = header['TESTTYPE']
+        else:
+            self.test_type = 'UNKNOWN'
+
+         if 'IMGTYPE' in header:
+            self.img_type = header['IMGTYPE']
+        else:
+            self.img_type = 'UNKNOWN'
+
+        if 'DATE-OBS' in header:
+            self.date = datetime.datetime.strptime(
             header['DATE-OBS'], '%Y-%m-%dT%H:%M:%S.%f')
-        self.date_str = self.date.strftime('%Y%m%d_%H%M%S')
+            self.date_str = self.date.strftime('%Y%m%d_%H%M%S')
+        else:
+            print 'ERROR! Wrong format of header, file "%s"' % self.file
 
         fits_file.close()
 
@@ -79,22 +99,16 @@ class FileInfo(object):
         if self.dev_key in _DEV:
             self.dev_name = _DEV[self.dev_key]
         else:
-            print 'ERROR! Wrong format of header, file "%s"' % self.file
+            print 'ERROR! Unknown dev_key "%s", file "%s"' % (self.dev_key self.file)
 
     def set_index(self):
         """ set index of CCD for sorting purposes """
-        if self.dev_name in _DEV_INDEX:
-            self.dev_index = _DEV_INDEX.index(self.dev_name)
-        else:
-            print 'ERROR! Wrong format of header, file "%s"' % self.file
+        self.dev_index = _DEV_INDEX.index(self.dev_name)
 
     def set_index_tr(self):
         """ set index of CCD for sorting purposes """
-        if self.dev_name in _DEV_INDEX_TR:
-            self.dev_index_tr = _DEV_INDEX_TR.index(self.dev_name)
-        else:
-            print 'ERROR! Wrong format of header, file "%s"' % self.file
-
+        self.dev_index_tr = _DEV_INDEX_TR.index(self.dev_name)
+        
     def set_reb(self):
         """ set REB number """
         reb = self.dev_name[0:1]
