@@ -189,7 +189,7 @@ class ImgInfo(object):
             self.date = self.img[0].date
             self.date_str = self.img[0].date_str
             self.ccd_num += 1
-            self.out_dir = self.run + '/' + self.test_type + '_' + self.img_type + '/'
+            self.out_dir = '%s/%s_%s/' % (self.run, self.test_type, self.img_type)
         else:
             if self.make_check(self.img[self.ccd_num]):
                 self.ccd_num += 1
