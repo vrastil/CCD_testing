@@ -80,7 +80,7 @@ class FileInfo(object):
         else:
             self.test_type = 'UNKNOWN'
 
-         if 'IMGTYPE' in header:
+        if 'IMGTYPE' in header:
             self.img_type = header['IMGTYPE']
         else:
             self.img_type = 'UNKNOWN'
