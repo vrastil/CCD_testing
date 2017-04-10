@@ -176,6 +176,13 @@ class ImgInfo(object):
         """ make check that all images have the same properties """
         check = True
         check *= (img.run == self.run and img.test_type == self.test_type and
+                  img.img_type == self.img_type)
+        return check
+
+    def make_check_w_time(self, img):
+        """ make check that all images have the same properties """
+        check = True
+        check *= (img.run == self.run and img.test_type == self.test_type and
                   img.img_type == self.img_type and img.date == self.date)
         return check
 
