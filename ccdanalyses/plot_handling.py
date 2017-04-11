@@ -452,7 +452,6 @@ def plot_raft_map(data, img, TITLE, OUTDIR, vmin=None, vmax=None):
     """ create a raft map 6x24 for data in CCDsx16 array """
 
     map = np.zeros((6, 24))
-
     for i, fli in enumerate(img):
         x = (fli.dev_index / 3) * 2 # [0, 2, 4]
         y = (fli.dev_index % 3) * 8 # [0, 8, 16]
@@ -461,13 +460,32 @@ def plot_raft_map(data, img, TITLE, OUTDIR, vmin=None, vmax=None):
             yy = y + j % 8 # [0, 1,..., 23]
             map[xx, yy] = data[i, j]
 
+    yseg = range(6)
+    ylab = ["0-7", "10-17", "0-7", "10-17", "0-7", "10-17"]
+    xseg = range(0, 24, 4)
+    xlab = ["0", "4", "0", "4", "0", "4"]
+
     fig = plt.figure(figsize=(10, 10))
-    #cbar_ax = fig.add_axes([0.85, 0.137, 0.05, 0.73])
-    im = plt.imshow(map, interpolation='nearest', cmap='jet', aspect=4, vmin=vmin, vmax=vmax)
-    #fig.colorbar(im, cax=cbar_ax)
-    fig.colorbar(im)
-    fig.suptitle(TITLE, y=0.87, size=19)
-    #fig.suptitle(TITLE)
+    ax1 = fig.add_subplot(111)
+    im = ax1.imshow(map, interpolation='nearest', cmap='jet', aspect=4, vmin=vmin, vmax=vmax)
+    plt.yticks(yseg, ylab)
+    plt.xticks(xseg, xlab)
+    plt.annotate('S22', xy=(0, 0), xytext=(4, -0.8), fontsize=15, ha='center', va='center')
+    plt.annotate('S12', xy=(0, 0), xytext=(12, -0.8), fontsize=15, ha='center', va='center')
+    plt.annotate('S02', xy=(0, 0), xytext=(20, -0.8), fontsize=15, ha='center', va='center')
+    plt.annotate('S02', xy=(0, 0), xytext=(24., 0.5), fontsize=15, ha='left', va='center')
+    plt.annotate('S01', xy=(0, 0), xytext=(24., 2.5), fontsize=15, ha='left', va='center')
+    plt.annotate('S00', xy=(0, 0), xytext=(24., 4.5), fontsize=15, ha='left', va='center')
+    ax1.vlines(7.5, -0.5, 5.5)
+    ax1.vlines(15.5, -0.5, 5.5)
+    ax1.hlines(1.5, 0, 23.5)
+    ax1.hlines(3.5, 0, 23.5)
+    plt.subplots_adjust(left=0.07, bottom=0.05, right=0.8, top=0.95, wspace=0, hspace=0)
+    #cbar_ax = fig.add_axes([0.15, 0.03, 0.7, 0.05])
+    #fig.colorbar(im, cax=cbar_ax, orientation="horizontal")
+    cbar_ax = fig.add_axes([0.87, 0.15, 0.05, 0.7])
+    fig.colorbar(im, cax=cbar_ax)
+    fig.suptitle(TITLE, y=0.98, size=19)
     plt.savefig(OUTDIR + TITLE + '_map.png')
     plt.show()
     plt.close(fig)
