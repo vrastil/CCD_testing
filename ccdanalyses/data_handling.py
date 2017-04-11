@@ -140,10 +140,10 @@ def make_tab_corcoef_from_fl(img, ROIROWS=slice(515, 550), ROICOLS=slice(10, 199
     return make_tab_corcoef(data)
 
 def load_data(img, data_key):
+    """ return two-dimensional numpy array """
     data = []
     for f in img:
         d = fits.getdata(f.file)
-        for sp in d[data_key]:
-            data.append(sp)
+        data.append(d[data_key])
 
-    return data
+    return np.array(data)
