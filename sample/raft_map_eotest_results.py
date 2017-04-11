@@ -3,7 +3,7 @@ import ccdanalyses.data_handling as dh
 import ccdanalyses.plot_handling as ph
 
 run_dir = '/gpfs/mnt/gpfs01/astro/workarea/ccdtest/prod/LCA-11021_RTM/LCA-11021_RTM-004/3764/collect_raft_results'
-out_dir = '/gpfs/mnt/gpfs01/astro/www/vrastil/test/'
+out_dir = '/gpfs/mnt/gpfs01/astro/www/vrastil/test/raft_maps'
 
 all_files = [name[0] for name in fh.get_files_in_traverse_dir(
     run_dir, '*eotest_results.fits')]
