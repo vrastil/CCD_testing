@@ -7,4 +7,4 @@ keys = ['read_noise', 'gain', 'psf_sigma', 'full_well', 'dark_current_95', 'max_
         'ptc_gain', 'cti_high_parallel', 'cti_high_serial', 'cti_low_parallel', 'cti_low_serial']
 
 
-get_raft_maps(run_dir, keys, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/Raft_maps/')
+get_raft_maps(run_dir, keys, out_dir)
