@@ -13,8 +13,6 @@ def analyze_single_img(img, out_dir, omit_rebs=[]):
     img:	ImgInfo storing files of one image
     out_dir:	output directory"""
 
-    if not out_dir.endswith('/'):
-        out_dir += '/'
     out_dir += img.out_dir + img.date_str + '/'
     if not os.path.exists(out_dir):
         print "Creating outdir '%s'" % out_dir
@@ -52,6 +50,9 @@ def analyze_single_img(img, out_dir, omit_rebs=[]):
 
 def analyze_run(RUN_DIR, OUT_DIR='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/Noise_studies/', num_img=0, omit_REBs=[]):
     """ Analyze and plot results for the whole run. """
+
+    if not OUT_DIR.endswith('/'):
+        OUT_DIR += '/'
 
     print 'Loading images...'
     run = fh.RunInfo(RUN_DIR)
@@ -117,3 +118,32 @@ def compare_runs(OUT_DIR='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/N
     f_hist.close()
     ph.plot_summary(y_stat, x_run, OUT_DIR)
     print "Everything done!"
+
+
+def get_raft_maps(run_dir, keys, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/Raft_maps/', values=None):
+    """ load data and plots results (raft maps) from run_dir, try to load all data with names in list of keys,
+    and if dictionary of min and max values is present, use them for plotting
+
+     keys:   list of keys
+     values: dictionary { key : (vmin, vmax) }
+     """
+    if values is None:
+        values = {}
+
+    all_files = [name[0] for name in fh.get_files_in_traverse_dir(
+        run_dir, '*eotest_results.fits')]
+    all_files_info = [fh.FileInfo(a_file) for a_file in all_files]
+
+    img = fh.ImgInfo()
+    for file_info in all_files_info:
+        img.add_img(file_info)
+
+    for key in keys:
+        data = dh.load_data(img, key)
+        if data is not None:
+            if key in values:
+                vmin, vmax = values[key]
+            else:
+                vmin, vmax = None, None
+            ph.plot_raft_map(data, img, key, out_dir, vmin, vmax)
+

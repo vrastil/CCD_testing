@@ -144,6 +144,9 @@ def load_data(img, data_key):
     data = []
     for f in img:
         d = fits.getdata(f.file)
-        data.append(d[data_key])
+        if data_key in d:
+            data.append(d[data_key])
+        else:
+            return None
 
     return np.array(data)

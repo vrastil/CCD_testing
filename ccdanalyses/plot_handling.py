@@ -461,7 +461,7 @@ def plot_raft_map(data, img, TITLE, OUTDIR, vmin=None, vmax=None):
             map[xx, yy] = data[i, j]
 
     yseg = range(6)
-    ylab = ["0-7", "10-17", "0-7", "10-17", "0-7", "10-17"]
+    ylab = ["00-07", "10-17", "0-7", "10-17", "0-7", "10-17"]
     xseg = range(0, 24, 4)
     xlab = ["0", "4", "0", "4", "0", "4"]
 
