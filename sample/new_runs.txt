@@ -1,5 +1,1 @@
 /gpfs/mnt/gpfs01/astro/workarea/ccdtest/prod/LCA-11021_RTM/LCA-11021_RTM-004/3764/fe55_raft_acq
-/gpfs/mnt/gpfs01/astro/workarea/ccdtest/prod/LCA-11021_RTM/LCA-11021_RTM-004/3764/flat_pair_raft_acq
-/gpfs/mnt/gpfs01/astro/workarea/ccdtest/prod/LCA-11021_RTM/LCA-11021_RTM-004/3764/preflight_acq
-/gpfs/mnt/gpfs01/astro/workarea/ccdtest/prod/LCA-11021_RTM/LCA-11021_RTM-004/3764/qe_raft_acq
-/gpfs/mnt/gpfs01/astro/workarea/ccdtest/prod/LCA-11021_RTM/LCA-11021_RTM-004/3764/sflat_raft_acq

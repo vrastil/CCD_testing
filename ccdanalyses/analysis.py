@@ -145,7 +145,7 @@ def get_raft_maps(run_dir, keys, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8
         img.add_img(file_info)
     print 'Loaded %i files.' % len(all_files)
 
-    out_dir += img.run + '/'
+    out_dir += str(img.run) + '/'
     if not os.path.exists(out_dir):
         print "Creating outdir '%s'" % out_dir
         os.makedirs(out_dir)
