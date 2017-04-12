@@ -25,9 +25,11 @@ def analyze_single_img(img, out_dir, omit_rebs=[]):
     title = img.run + '_' + img.date_str
     bin_num = (45 * img.ccd_num) / 9
     # data
+    print "Getting data..."
     mean, noise, dnoise, overscan = dh.make_tab_all(img)
     corcoef = dh.make_tab_corcoef_from_fl(img)
     # save data
+    print "Saving data..."
     data, names = (mean, noise, dnoise, overscan, corcoef), ("mean", "noise", "dnoise", "overscan", "corcoef")
     if not os.path.exists(out_dir+'data/'):
         print "Creating outdir '%s'" % (out_dir + 'data/')
@@ -38,6 +40,7 @@ def analyze_single_img(img, out_dir, omit_rebs=[]):
         np.save(out_dir+'data/%s' % nam, dat)
 
     # plot data
+    print "Plotting..."
     ph.plot_overscan(overscan, img, title, out_dir)
     ph.plot_overscan_diff(overscan, img, title, out_dir)
     ph.plot_mean_std_stddelta(mean, noise, dnoise, img, title, out_dir)
@@ -130,14 +133,24 @@ def get_raft_maps(run_dir, keys, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8
     if values is None:
         values = {}
 
+    if not out_dir.endswith('/'):
+        out_dir += '/'
+
+    print 'Loading files...'
     all_files = [name[0] for name in fh.get_files_in_traverse_dir(
         run_dir, '*eotest_results.fits')]
     all_files_info = [fh.FileInfo(a_file) for a_file in all_files]
-
     img = fh.ImgInfo()
     for file_info in all_files_info:
         img.add_img(file_info)
+    print 'Loaded %i files.' % len(all_files)
 
+    out_dir += img.out_dir + '/'
+    if not os.path.exists(out_dir):
+        print "Creating outdir '%s'" % out_dir
+        os.makedirs(out_dir)
+
+    print "Plotting..."
     for key in keys:
         data = dh.load_data(img, key)
         if data is not None:
