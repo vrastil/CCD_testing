@@ -310,4 +310,3 @@ class GainInfo(object):
             fits_file.close()
 
         self.len = len(fl)
-        

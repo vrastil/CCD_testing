@@ -56,6 +56,8 @@ def analyze_run(RUN_DIR, OUT_DIR='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_An
 
     if not OUT_DIR.endswith('/'):
         OUT_DIR += '/'
+    if not RUN_DIR.endswith('/'):
+        RUN_DIR += '/'
 
     print 'Loading images...'
     run = fh.RunInfo(RUN_DIR)
