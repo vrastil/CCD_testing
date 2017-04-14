@@ -118,8 +118,9 @@ class FileInfo(object):
         reb = self.dev_name[0:1]
         self.reb = int(reb)
 
-    def __init__(self, a_file):
+    def __init__(self, a_file, a_subdir):
         self.load_file(a_file)
+        self.subdir = a_subdir
         self.set_name()
         self.set_index()
         self.set_index_tr()
@@ -152,6 +153,7 @@ class ImgInfo(object):
         self.date = ''
         self.date_str = ''
         self.ccd_num = 0
+        self.subdir = ''
         self.out_dir = ''
 
     def __getitem__(self, i):
@@ -176,14 +178,15 @@ class ImgInfo(object):
         """ make check that all images have the same properties """
         check = True
         check *= (img.run == self.run and img.test_type == self.test_type and
-                  img.img_type == self.img_type)
+                  img.img_type == self.img_type and img.subdir == self.subdir)
         return check
 
     def make_check_w_time(self, img):
         """ make check that all images have the same properties """
         check = True
         check *= (img.run == self.run and img.test_type == self.test_type and
-                  img.img_type == self.img_type and img.date == self.date)
+                  img.img_type == self.img_type and img.subdir == self.subdir
+                  and img.date == self.date)
         return check
 
     def add_img(self, a_file_info):
@@ -195,8 +198,9 @@ class ImgInfo(object):
             self.img_type = self.img[0].img_type
             self.date = self.img[0].date
             self.date_str = self.img[0].date_str
+            self.subdir = self.img[0].subdir
             self.ccd_num += 1
-            self.out_dir = '%s/%s_%s/' % (self.run, self.test_type, self.img_type)
+            self.out_dir = '%s/%s_%s/%s' % (self.run, self.test_type, self.img_type, self.subdir)
         else:
             if self.make_check(self.img[self.ccd_num]):
                 self.ccd_num += 1
@@ -226,10 +230,13 @@ class RunInfo(object):
         """ load all available images, i.e. all .fits files in run_dir """
         os.chdir(self.run_dir)
 #        print "Before loading files:\t", datetime.datetime.now()
-        all_files = [name[0] for name in get_files_in_traverse_dir(self.run_dir, '*.fits')]
-        all_files_info = [FileInfo(a_file) for a_file in all_files]
+        all_files_info = []
+        for a_file, subdir in get_files_in_traverse_dir(self.run_dir, '*.fits'):
+            subdir = subdir.split('/')
+            subdir = subdir[1] + '/' + subdir[2] +'/' #only v and vnum
+            all_files_info.append(FileInfo(a_file, subdir))
 
- #       print "Before sorting files:\t", datetime.datetime.now()
+#       print "Before sorting files:\t", datetime.datetime.now()
         for file_info in all_files_info:
             if file_info.date not in self.img:
                 self.img[file_info.date] = ImgInfo()
