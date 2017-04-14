@@ -137,26 +137,35 @@ def get_raft_maps(run_dir, keys, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8
         out_dir += '/'
 
     print 'Loading files...'
-    all_files = [name[0] for name in fh.get_files_in_traverse_dir(
-        run_dir, '*eotest_results.fits')]
-    all_files_info = [fh.FileInfo(a_file) for a_file in all_files]
-    img = fh.ImgInfo()
+    all_files_info = []
+    for a_file, subdir in fh.get_files_in_traverse_dir(run_dir, '*eotest_results.fits'):
+        try:
+            subdir = subdir.split('/')
+            subdir = subdir[0] + '/' + subdir[1] +'/' #only v and vnum
+        except:
+            subdir = ''
+        all_files_info.append(fh.FileInfo(a_file, subdir))
+
+    img_v = {}
     for file_info in all_files_info:
-        img.add_img(file_info)
-    print 'Loaded %i files.' % len(all_files)
+        if file_info.subdir not in img_v:
+            img_v[file_info.subdir] = fh.ImgInfo()
+        img_v[file_info.subdir].add_img(file_info)
+    print 'Loaded %i files.' % len(all_files_info)
 
-    out_dir += str(img.run) + '/'
-    if not os.path.exists(out_dir):
-        print "Creating outdir '%s'" % out_dir
-        os.makedirs(out_dir)
+    for img in img_v:
+        out_dir_ = out_dir + str(img.run) + '/' + img.subdir
+        if not os.path.exists(out_dir_):
+            print "Creating outdir '%s'" % out_dir_
+            os.makedirs(out_dir_)
 
-    print "Plotting..."
-    for key in keys:
-        data = dh.load_data(img, key)
-        if data is not None:
-            if key in values:
-                vmin, vmax = values[key]
-            else:
-                vmin, vmax = None, None
-            ph.plot_raft_map(data, img, key, out_dir, vmin, vmax)
+        print "Plotting..."
+        for key in keys:
+            data = dh.load_data(img, key)
+            if data is not None:
+                if key in values:
+                    vmin, vmax = values[key]
+                else:
+                    vmin, vmax = None, None
+                ph.plot_raft_map(data, img, key, out_dir_, vmin, vmax)
 
