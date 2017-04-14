@@ -2,7 +2,7 @@ from ccdanalyses.analysis import analyze_run
 from ccdanalyses.file_handling import load_runs
 
 RUN_DIRs = load_runs('/direct/astro+u/vrastil/CCD_testing/CCD_testing/sample/new_runs.txt')
-OUT_DIR = '/gpfs/mnt/gpfs01/astro/www/vrastil/test/AN/'
+OUT_DIR = '/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/Noise_studies/'
 
 # NUM_IMG : number of images to be processed, set 0 for all available
 NUM_IMG = 3
