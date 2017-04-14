@@ -232,8 +232,12 @@ class RunInfo(object):
 #        print "Before loading files:\t", datetime.datetime.now()
         all_files_info = []
         for a_file, subdir in get_files_in_traverse_dir(self.run_dir, '*.fits'):
-            subdir = subdir.split('/')
-            subdir = subdir[1] + '/' + subdir[2] +'/' #only v and vnum
+            try:
+                subdir = subdir.split('/')
+                subdir = subdir[1] + '/' + subdir[2] +'/' #only v and vnum
+            except:
+                subdir = ''
+
             all_files_info.append(FileInfo(a_file, subdir))
 
 #       print "Before sorting files:\t", datetime.datetime.now()
