@@ -68,7 +68,7 @@ class FileInfo(object):
         if 'RUNNUM' in header:
             self.run = header['RUNNUM']
         else:
-            self.run = 'UNKNOWN'
+            self.run = 'UNKNOWN_RUN'
 
         if 'LSST_NUM' in header:
             self.dev_key = (header['LSST_NUM'])[10:13]

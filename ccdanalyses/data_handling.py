@@ -149,4 +149,8 @@ def load_data(img, data_key):
         except:
             return None
 
-    return np.array(data)
+    data = np.array(data)
+    if data.any():
+        return data
+    else:
+        return None
