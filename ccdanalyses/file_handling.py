@@ -233,7 +233,6 @@ class RunInfo(object):
     def add_all_img(self):
         """ load all available images, i.e. all .fits files in run_dir """
         os.chdir(self.run_dir)
-#        print "Before loading files:\t", datetime.datetime.now()
         all_files_info = []
         for a_file, subdir in get_files_in_traverse_dir(self.run_dir, '*.fits'):
             try:
@@ -243,7 +242,6 @@ class RunInfo(object):
                 subdir = ''
             all_files_info.append(FileInfo(a_file, subdir))
 
-#       print "Before sorting files:\t", datetime.datetime.now()
         for file_info in all_files_info:
             if file_info.date not in self.img:
                 self.img[file_info.date] = ImgInfo()
@@ -251,7 +249,6 @@ class RunInfo(object):
 
         for img in self:
             img.sort()
-  #      print "After sorting files:\t", datetime.datetime.now()
 
         for imgi in self.img.itervalues():
             if imgi.out_dir not in self.runs:
