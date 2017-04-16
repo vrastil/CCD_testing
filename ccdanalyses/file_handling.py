@@ -174,6 +174,16 @@ class ImgInfo(object):
         )
         return str_info
 
+    def info(self):
+        """ return string, info about the image """
+        str_info = self.__repr__() + '\nCCDs order= '
+        fl_info = ''
+        for fli in self:
+            str_info += "'%s' " % fli.dev_name
+            fl_info += '\t' + fli.file + '\n'
+
+        return str_info + '\nFiles=\n' + fl_info
+
     def make_check(self, img):
         """ make check that all images have the same properties """
         check = True

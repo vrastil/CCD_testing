@@ -38,6 +38,8 @@ def analyze_single_img(img, out_dir, omit_rebs=[]):
     for i, dat in enumerate(data):
         nam = names[i]
         np.save(out_dir+'data/%s' % nam, dat)
+    with open(out_dir+'data/img_info.txt', "w") as text_file:
+        text_file.write(img.info())
 
     # plot data
     print "Plotting..."
