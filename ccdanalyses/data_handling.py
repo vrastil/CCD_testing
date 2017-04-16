@@ -4,90 +4,11 @@ from astropy.io import fits
 
 from . import misc
 
-
-def make_tab_mean(img, BOXSZ=10, ximg=[515, 550], yimg=[10, 1990]):
-    """ Tabluate the mean in 9x16 arrays.
-            img    ImgInfo()
-            BOXS	size of box used to compute statistical properties of segments
-            ximg	specify rows
-            yimg	specify columms
-
-            return	ndarray(n_ccd x 16) """
-
-    m = np.empty((img.ccd_num, 16))
-
-    for i, fli in enumerate(img):
-        h = fits.open(fli.file)
-        for j in range(1, 17):
-            m[i, j - 1] = misc.boxesmean(h[j].data,
-                                         BOXSZ=BOXSZ, ximg=ximg, yimg=yimg)
-        h.close()
-
-    return m
-
-
-def make_tab_std(img, BOXSZ=10, ximg=[515, 550], yimg=[10, 1990]):
-    """ tabluate the std in 9x16 arrays.
-            img    ImgInfo()
-            ximg    specify rows
-            yimg    specify columms
-
-            return  ndarray(n_ccd x 16) """
-
-    n = np.empty((img.ccd_num, 16))
-
-    for i, fli in enumerate(img):
-        h = fits.open(fli.file)
-        for j in range(1, 17):
-            n[i, j - 1] = misc.boxesstd(h[j].data,
-                                        BOXSZ=BOXSZ, ximg=ximg, yimg=yimg)
-        h.close()
-
-    return n
-
-
-def make_tab_std_delta(img, BOXSZ=10, ximg=[515, 550], yimg=[10, 1990]):
-    """ tabluate the std in 9x16 arrays.
-            img    ImgInfo()
-            ximg    specify rows
-            yimg    specify columms
-
-            return  ndarray(n_ccd x 16) """
-
-    nd = np.empty((img.ccd_num, 16))
-
-    for i, fli in enumerate(img):
-        h = fits.open(fli.file)
-        for j in range(1, 9):
-            nd[i, j - 1] = misc.boxesstd((h[j].data - h[8].data) /
-                                         np.sqrt(2.), BOXSZ=BOXSZ, ximg=ximg, yimg=yimg)
-        for j in range(9, 17):
-            nd[i, j - 1] = misc.boxesstd((h[j].data - h[16].data) /
-                                         np.sqrt(2.), BOXSZ=BOXSZ, ximg=ximg, yimg=yimg)
-        h.close()
-
-    return nd
-
-
-def make_tab_overscan(img, ximg=[515, 550]):
-    """ tabluate the overscan in 9x16x2048 array.
-            img    ImgInfo()
-            ximg    specify rows
-
-            return  ndarray(n_ccd x 16 x 2048) """
-
-    overscan = np.empty((img.ccd_num, 16, 2048))
-
-    for i, fli in enumerate(img):
-        h = fits.open(fli.file)
-        for j in range(1, 17):
-            overscan[i, j -
-                     1] = misc.debias(np.mean(h[j].data[:, ximg[0]:ximg[1]], 1))
-
-        h.close()
-
-    return overscan
-
+def slice_sort_seg(o_fits_file):
+    """ take only segment data ([1:17]) and sort them"""
+    hl = o_fits_file[1:17]
+    hl.sort(key=lambda x: int(x.name[-2:]))
+    return hl
 
 def make_tab_all(img, BOXSZ=10, ximg=[515, 550], yimg=[10, 1990]):
     """ tabluate the mean and std in 9x16 arrays and overscan in 9x16x2048 array.
@@ -103,21 +24,22 @@ def make_tab_all(img, BOXSZ=10, ximg=[515, 550], yimg=[10, 1990]):
     overscan = np.empty((img.ccd_num, 16, 2048))
 
     for i, fli in enumerate(img):
-        h = fits.open(fli.file)
-        for j in range(1, 17):
-            m[i, j - 1] = misc.boxesmean(h[j].data,
-                                         BOXSZ=BOXSZ, ximg=ximg, yimg=yimg)
-            n[i, j - 1] = misc.boxesstd(h[j].data,
-                                        BOXSZ=BOXSZ, ximg=ximg, yimg=yimg)
-            overscan[i, j -
-                     1] = misc.debias(np.mean(h[j].data[:, ximg[0]:ximg[1]], 1))
-        for j in range(1, 9):
-            nd[i, j - 1] = misc.boxesstd((h[j].data - h[8].data) /
-                                         np.sqrt(2.), BOXSZ=BOXSZ, ximg=ximg, yimg=yimg)
-        for j in range(9, 17):
-            nd[i, j - 1] = misc.boxesstd((h[j].data - h[16].data) /
-                                         np.sqrt(2.), BOXSZ=BOXSZ, ximg=ximg, yimg=yimg)
-        h.close()
+        o_fits_file = fits.open(fli.file)
+        h = slice_sort_seg(o_fits_file)
+
+        for j in range(16):
+            m[i, j] = misc.boxesmean(h[j].data,
+                                     BOXSZ=BOXSZ, ximg=ximg, yimg=yimg)
+            n[i, j] = misc.boxesstd(h[j].data,
+                                    BOXSZ=BOXSZ, ximg=ximg, yimg=yimg)
+            overscan[i, j] = misc.debias(np.mean(h[j].data[:, ximg[0]:ximg[1]], 1))
+        for j in range(0, 8):
+            nd[i, j] = misc.boxesstd((h[j].data - h[7].data) /
+                                     np.sqrt(2.), BOXSZ=BOXSZ, ximg=ximg, yimg=yimg)
+        for j in range(8, 16):
+            nd[i, j] = misc.boxesstd((h[j].data - h[15].data) /
+                                     np.sqrt(2.), BOXSZ=BOXSZ, ximg=ximg, yimg=yimg)
+        o_fits_file.close()
 
     return m, n, nd, overscan
 
@@ -135,8 +57,14 @@ def make_tab_corcoef(data):
 
 def make_tab_corcoef_from_fl(img, ROIROWS=slice(10, 1990), ROICOLS=slice(515, 550)):
     """ generate correlation coefficients for an img: ImgInfo() """
-    data = [fits.getdata(f.file, i)[ROIROWS, ROICOLS]
-            for f in img for i in range(1, 17)]
+    data = []
+    for fli in img:
+        o_fits_file = fits.open(fli.file)
+        h = slice_sort_seg(o_fits_file)
+        for j in range(16):
+            data.append(h[j].data[ROIROWS, ROICOLS])
+
+        o_fits_file.close()
     return make_tab_corcoef(data)
 
 def load_data(img, data_key):

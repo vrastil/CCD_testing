@@ -212,6 +212,10 @@ class ImgInfo(object):
                 )
                 return False
 
+    def sort(self):
+        """ sort CCDs: '00', '01',...,'22' """
+        self.img.sort(key=lambda x: x.dev_index_tr, reverse=True)
+
 
 class RunInfo(object):
     """ Class containing all information about directory structure,
@@ -244,6 +248,9 @@ class RunInfo(object):
             if file_info.date not in self.img:
                 self.img[file_info.date] = ImgInfo()
             self.img[file_info.date].add_img(file_info)
+
+        for img in self:
+            img.sort()
   #      print "After sorting files:\t", datetime.datetime.now()
 
         for imgi in self.img.itervalues():
