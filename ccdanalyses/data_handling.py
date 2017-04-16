@@ -133,7 +133,7 @@ def make_tab_corcoef(data):
     return aa
 
 
-def make_tab_corcoef_from_fl(img, ROIROWS=slice(515, 550), ROICOLS=slice(10, 1990)):
+def make_tab_corcoef_from_fl(img, ROIROWS=slice(10, 1990), ROICOLS=slice(515, 550)):
     """ generate correlation coefficients for an img: ImgInfo() """
     data = [fits.getdata(f.file, i)[ROIROWS, ROICOLS]
             for f in img for i in range(1, 17)]
