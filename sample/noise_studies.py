@@ -8,7 +8,6 @@ else:
     RUN_DIRs = [sys.argv[1]]
 
 OUT_DIR = '/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/Noise_studies/'
-OUT_DIR = '/home/vrastil/Documents/Brookhaven/test_output/'
 
 # NUM_IMG : number of images to be processed, set 0 for all available
 NUM_IMG = 1
