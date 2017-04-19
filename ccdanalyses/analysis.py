@@ -137,6 +137,9 @@ def get_raft_maps(run_dir, keys, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8
     if values is None:
         values = {}
 
+    if not run_dir.endswith('/'):
+        run_dir += '/'
+
     if not out_dir.endswith('/'):
         out_dir += '/'
 
