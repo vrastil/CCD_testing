@@ -1,24 +1,9 @@
-executing on host: astro0003 with pid: 667
+executing on host: astro0002 with pid: 13953
 tcgetattr: Inappropriate ioctl for device
 Bad : modifier in $ (/).
-require:        {'job_name': 'noise_analysis'}
-command:        'notify'
-user:           'vrastil'
-notification:   'done'
-commandline:    "export PYTHONPATH=$PYTHONPATH:/direct/astro+u/vrastil/CCD_testing/CCD_testing\nsetenv WD '/direct/astro+u/vrastil/CCD_testing/CCD_testing/sample'\ncd $WD\npython noise_studies.py > jobs/job.log\n"
-pid:            667
-response:       'OK'
-Unexpected error: <type 'exceptions.NameError'>
+Connection to astro0002 closed.
 export PYTHONPATH=$PYTHONPATH:/direct/astro+u/vrastil/CCD_testing/CCD_testing
 setenv WD '/direct/astro+u/vrastil/CCD_testing/CCD_testing/sample'
 cd $WD
-python noise_studies.py > jobs/job.log
+unbuffer python noise_studies.py > jobs/job.log
 
-Traceback (most recent call last):
-  File "<string>", line 1012, in <module>
-  File "<string>", line 989, in main
-  File "<string>", line 819, in execute
-  File "/direct/astro+u/tthrowe/Astro/wq_exe_140801/build/wq/out00-PYZ.pyz/subprocess", line 1357, in wait
-  File "/direct/astro+u/tthrowe/Astro/wq_exe_140801/build/wq/out00-PYZ.pyz/subprocess", line 478, in _eintr_retry_call
-  File "<string>", line 682, in receive_kill
-NameError: global name 'exit' is not defined

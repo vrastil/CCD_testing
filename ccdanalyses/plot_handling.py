@@ -326,7 +326,8 @@ def plot_summary(data, run, OUT_DIR, SUPTITLE="Runs comparison"):
                  yerr=data[x, 5], linestyle='None')
     ax2.plot(x, data[:, 4], 'o', color='lightskyblue', label='median')
     ax2.set_ylabel('Noise', color='blue')
-#    ax2.set_ylim([0, 50])
+    ax2.set_ylim([0, 20])
+#    ax2.set_ylim(bottom=0)
     ax2.legend(numpoints=1)
 
     ax3 = plt.subplot(3, 1, 3)
@@ -335,7 +336,8 @@ def plot_summary(data, run, OUT_DIR, SUPTITLE="Runs comparison"):
                  yerr=data[x, 8], linestyle='None')
     ax3.plot(x, data[:, 7], 'o', color='salmon', label='median')
     ax3.set_ylabel('DNoise', color='red')
- #   ax3.set_ylim([0, 75])
+    ax3.set_ylim([0, 20])
+#    ax3.set_ylim(bottom=0)
     ax3.legend(numpoints=1)
 
     plt.xticks(x, run, rotation=45, ha='right', fontsize=7)

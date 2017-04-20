@@ -5,6 +5,6 @@ command: |
     export PYTHONPATH=$PYTHONPATH:/direct/astro+u/vrastil/CCD_testing/CCD_testing
     setenv WD '/direct/astro+u/vrastil/CCD_testing/CCD_testing/sample'
     cd $WD
-    python noise_studies.py > jobs/job.log
+    unbuffer python noise_studies.py > jobs/job.log
 
 job_name: noise_analysis
