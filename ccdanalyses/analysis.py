@@ -175,4 +175,5 @@ def get_raft_maps(run_dir, keys, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8
                 else:
                     vmin, vmax = None, None
                 ph.plot_raft_map(data, img, key, out_dir_, vmin, vmax)
-
+                
+    print "Everything done!"
