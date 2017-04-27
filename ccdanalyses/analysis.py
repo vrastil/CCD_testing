@@ -173,7 +173,8 @@ def get_raft_maps(run_dir, keys, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8
                 if key in values:
                     vmin, vmax = values[key]
                 else:
-                    vmin, vmax = None, None
+                    vmin = np.percentile(data, 10)
+                    vmax = np.percentile(data, 90)
                 ph.plot_raft_map(data, img, key, out_dir_, vmin, vmax)
 
     print "Everything done!"
