@@ -7,12 +7,15 @@ from astropy.io import fits
 # global variables for deciphering devices : _DEV, _DEV_INDEX, _DEV_INDEX_TR
 
 _DEV = {
-    '145': '00', '022': '01', '041': '02',
-    '100': '10', '017': '11', '018': '12',
-    '102': '20', '146': '21', '103': '22',
-    '078': '00', '034': '01', '068': '02',
-    '072': '10', '061': '11', '085': '12',
-    '062': '20', '050': '21', '079': '22'
+    'ITL-3800C-145-Dev' : '00', 'ITL-3800C-022-Dev' : '01', 'ITL-3800C-041-Dev' : '02',
+    'ITL-3800C-100-Dev' : '10', 'ITL-3800C-017-Dev' : '11', 'ITL-3800C-018-Dev' : '12',
+    'ITL-3800C-102-Dev' : '20', 'ITL-3800C-146-Dev' : '21', 'ITL-3800C-103-Dev' : '22',
+    'ITL-3800C-078-Dev' : '00', 'ITL-3800C-034-Dev' : '01', 'ITL-3800C-068-Dev' : '02',
+    'ITL-3800C-072-Dev' : '10', 'ITL-3800C-061-Dev' : '11', 'ITL-3800C-085-Dev' : '12',
+    'ITL-3800C-062-Dev' : '20', 'ITL-3800C-050-Dev' : '21', 'ITL-3800C-079-Dev' : '22',
+    'E2V-CCD250-220-Dev' : '00', 'E2V-CCD250-239-Dev' : '01', 'E2V-CCD250-154-Dev' : '02',
+    'E2V-CCD250-165-Dev' : '10', 'E2V-CCD250-130-Dev' : '11', 'E2V-CCD250-153-Dev' : '12',
+    'E2V-CCD250-163-Dev' : '20', 'E2V-CCD250-216-Dev' : '21', 'E2V-CCD250-252-Dev' : '22'
 }
 
 _DEV_INDEX = ['22', '12', '02', '21', '11', '01', '20', '10', '00']
@@ -71,7 +74,7 @@ class FileInfo(object):
             self.run = 'UNKNOWN_RUN'
 
         if 'LSST_NUM' in header:
-            self.dev_key = (header['LSST_NUM'])[10:13]
+            self.dev_key = (header['LSST_NUM'])
         else:
             print 'ERROR! Wrong format of header, file "%s"' % self.file
 
