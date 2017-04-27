@@ -367,7 +367,7 @@ def plot_cor_ccd(a, fl, TITLE, OUT_DIR):
         i_min = 16 * i
         i_max = i_min + 16
         aa = a[i_min:i_max, i_min:i_max]
-        im = plt.imshow(aa, interpolation='nearest', cmap='jet', vmin=0)
+        im = plt.imshow(aa, interpolation='nearest', cmap='jet', vmin=0, vmax=0.2)
         ax1.set_title(f.dev_name)
         ax1.set_xlim(15.5, -0.5)
         ax1.set_ylim(-0.5, 15.5)
@@ -385,7 +385,7 @@ def plot_cor_ccd(a, fl, TITLE, OUT_DIR):
 
 def plot_cor_all(a, fl, TITLE, OUT_DIR):
     fig = plt.figure(figsize=(15, 15))
-    im = plt.imshow(a, interpolation='nearest', cmap='jet', vmin=0, vmax=1)
+    im = plt.imshow(a, interpolation='nearest', cmap='jet', vmin=0, vmax=0.2)
     seg = np.arange(0, len(a), 16)
     r = fl.ccd_num / 9.0
     plt.xticks(seg)

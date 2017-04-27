@@ -175,5 +175,20 @@ def get_raft_maps(run_dir, keys, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8
                 else:
                     vmin, vmax = None, None
                 ph.plot_raft_map(data, img, key, out_dir_, vmin, vmax)
-                
+
     print "Everything done!"
+
+
+def load_npy(info_txt):
+    """  """
+    with open(info_txt, 'r') as f:
+        content = f.readlines()
+    lines = []
+    for x in content:
+        if x.startswith('\t'): lines.append(x)
+    lines = [''.join(x.split()) for x in lines]
+    fli = [fh.FileInfo(f, '') for f in lines]
+
+    img = fh.ImgInfo()
+    for fl in fli:
+        img.add_img(fl)
