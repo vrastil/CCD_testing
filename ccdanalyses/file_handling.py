@@ -105,6 +105,8 @@ class FileInfo(object):
         """ convert CCD number into its 2D position in REB """
         if self.dev_key in _DEV:
             self.dev_name = _DEV[self.dev_key]
+        elif self.dev_key + '-Dev' in _DEV:
+            self.dev_name = _DEV[self.dev_key + '-Dev']
         else:
             print 'ERROR! Unknown dev_key "%s", file "%s"' % (self.dev_key, self.file)
 
