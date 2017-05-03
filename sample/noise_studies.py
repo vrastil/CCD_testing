@@ -7,7 +7,7 @@ if len(sys.argv) == 1:
 else:
     RUN_DIRs = [sys.argv[1]]
 
-OUT_DIR = '/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/Noise_studies/RTM1/'
+OUT_DIR = '/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/Noise_studies/RTM-2/'
 
 # NUM_IMG : number of images to be processed, set 0 for all available
 NUM_IMG = 3
