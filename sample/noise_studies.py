@@ -19,3 +19,5 @@ for RUN_DIR in RUN_DIRs:
 	print 'Run directory to be analyzed:\t%s' % RUN_DIR
 	print 'Output will be written to:\t%s' % OUT_DIR
 	analyze_run(RUN_DIR, OUT_DIR, NUM_IMG, omit_REBs)
+
+print 'All available runs analyzed!'
