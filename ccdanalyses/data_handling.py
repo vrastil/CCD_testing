@@ -10,7 +10,7 @@ def slice_sort_seg(o_fits_file):
     hl.sort(key=lambda x: int(x.name[-2:]))
     return hl
 
-def make_tab_all(img, BOXSZ=10, ximg=[515, 550], yimg=[10, 1990]):
+def make_tab_all(img, BOXSZ=10, ximg=[540, 565], yimg=[10, 1990]):
     """ tabluate the mean and std in 9x16 arrays and overscan in 9x16x2048 array.
             img    ImgInfo()
             ximg    specify rows
@@ -55,7 +55,7 @@ def make_tab_corcoef(data):
     return aa
 
 
-def make_tab_corcoef_from_fl(img, ROIROWS=slice(10, 1990), ROICOLS=slice(515, 550)):
+def make_tab_corcoef_from_fl(img, ROIROWS=slice(10, 1990), ROICOLS=slice(540, 565)):
     """ generate correlation coefficients for an img: ImgInfo() """
     data = []
     for fli in img:
