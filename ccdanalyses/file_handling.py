@@ -48,7 +48,7 @@ class FileInfo(object):
 
     def set_reb(self):
         """ set REB number """
-        reb = self.dev_name[0:1]
+        reb = self.dev_name[1:2]
         self.reb = int(reb)
 
     def __init__(self, a_file, ccd_list):

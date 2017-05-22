@@ -68,7 +68,7 @@ def analyze_run(run, imgtype="BIAS", db='Dev', site='BNL', prodServer='Dev',
         out_dir += '/'
 
     step = 'fe55_raft_acq'
-    print 'Step: %s\nLoading images...'
+    print 'Step: %s\nLoading images...' % step
 
     rO = raft_observation(run=run, step=step, imgtype=imgtype, db=db,
                           site=site, prodServer=prodServer, appSuffix=appSuffix)
@@ -110,7 +110,7 @@ def analyze_run(run, imgtype="BIAS", db='Dev', site='BNL', prodServer='Dev',
     ph.plot_one_run_summary(f_hist_file, out_dir)
 
     step = 'collect_raft_results'
-    print 'Step: %s\nLoading images...'
+    print 'Step: %s\nLoading images...' % step
     rO = raft_observation(run=run, step=step, db=db, site=site,
                           prodServer=prodServer, appSuffix=appSuffix)
     obs_dict = rO.find()
