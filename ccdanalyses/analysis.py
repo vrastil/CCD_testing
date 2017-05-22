@@ -51,7 +51,10 @@ def analyze_single_img(img, title='', out_dir=None, omit_rebs=[]):
 
     for i, dat in enumerate(data[0:3]):
         key = names[i]
-        vmin = np.percentile(dat, 10)
+        if key == "dnoise":
+            vmin = np.percentile(dat, 22.5)
+        else:
+            vmin = np.percentile(dat, 10)
         vmax = np.percentile(dat, 90)
         ph.plot_raft_map(dat, img, key, out_dir, vmin, vmax)
 
@@ -66,6 +69,7 @@ def analyze_run(run, imgtype="BIAS", db='Dev', site='BNL', prodServer='Dev',
 
     if not out_dir.endswith('/'):
         out_dir += '/'
+    out_dir += run + '/'
 
     step = 'fe55_raft_acq'
     print 'Step: %s\nLoading images...' % step
