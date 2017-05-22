@@ -488,6 +488,6 @@ def plot_raft_map(data, img, TITLE, OUTDIR, vmin=None, vmax=None):
     cbar_ax = fig.add_axes([0.87, 0.15, 0.05, 0.7])
     fig.colorbar(im, cax=cbar_ax)
     fig.suptitle(TITLE, y=0.98, size=19)
-    plt.savefig(OUTDIR + TITLE + '_map.png')
+    plt.savefig(OUTDIR + TITLE + '.png')
     plt.show()
     plt.close(fig)

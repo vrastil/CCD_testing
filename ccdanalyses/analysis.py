@@ -10,6 +10,9 @@ from . import data_handling as dh
 from . import plot_handling as ph
 from . import file_handling as fh
 
+keys = ['read_noise', 'gain', 'psf_sigma', 'full_well', 'dark_current_95', 'max_frac_dev',
+        'ptc_gain', 'cti_high_parallel', 'cti_high_serial', 'cti_low_parallel', 'cti_low_serial']
+
 def analyze_single_img(img, title='', out_dir=None, omit_rebs=[]):
     """ Analyze and plot results of single image.
     img:	ImgInfo storing files of one image
@@ -56,7 +59,7 @@ def analyze_single_img(img, title='', out_dir=None, omit_rebs=[]):
         else:
             vmin = np.percentile(dat, 10)
         vmax = np.percentile(dat, 90)
-        ph.plot_raft_map(dat, img, key, out_dir, vmin, vmax)
+        ph.plot_raft_map(dat, img, title + '_map_' + key, out_dir, vmin, vmax)
 
     return ph.plot_histogram_all_one_binning(mean, noise, dnoise, title, out_dir,
                                              bin_num, img.ccd_num, omit_rebs, read_rebs)
@@ -121,10 +124,29 @@ def analyze_run(run, imgtype="BIAS", db='Dev', site='BNL', prodServer='Dev',
     results = set()
     for val in obs_dict.itervalues():
         for a_file in val:
-            results.add(a_file)
+            if 'eotest_results' in a_file:
+                results.add(a_file)
     print 'Loaded %i files.' % len(results)
-
-
+    if len(results) == 0:
+        step = 'fe55_raft_analysis'
+        print 'Step: %s\nLoading images...' % step
+        rO = raft_observation(run=run, step=step, db=db, site=site,
+                            prodServer=prodServer, appSuffix=appSuffix)
+        obs_dict = rO.find()
+        results = set()
+        for val in obs_dict.itervalues():
+            for a_file in val:
+                if 'eotest_results' in a_file:
+                    results.add(a_file)
+        print 'Loaded %i files.' % len(results)
+    img = fh.ImgInfo(list(results), ccd_list, run=run, img_type=imgtype)
+    title = '%s_%s' % (run, imgtype)
+    for key in keys:
+        data = dh.load_data(img, key)
+        if data is not None:
+            vmin = np.percentile(data, 10)
+            vmax = np.percentile(data, 90)
+            ph.plot_raft_map(data, img, title + '_map_' + key, out_dir, vmin, vmax)
 
     print "Everything done!"
 
