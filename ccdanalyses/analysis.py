@@ -52,14 +52,13 @@ def analyze_single_img(img, title='', out_dir=None, omit_rebs=[]):
     ph.plot_cor_all(corcoef, img, title, out_dir)
     ph.plot_cor_ccd(corcoef, img, title, out_dir)
 
-    for i, dat in enumerate(data[0:3]):
-        key = names[i]
-        if key == "dnoise":
-            vmin = np.percentile(dat, 22.5)
-        else:
-            vmin = np.percentile(dat, 10)
-        vmax = np.percentile(dat, 90)
-        ph.plot_raft_map(dat, img, title + '_map_' + key, out_dir, vmin, vmax)
+    vmin = np.percentile(mean, 10)
+    vmax = np.percentile(mean, 90)
+    ph.plot_raft_map(mean, img, title + '_map_mean', out_dir, vmin, vmax)
+    vmin = np.percentile(noise, 10)
+    vmax = np.percentile(noise, 90)
+    ph.plot_raft_map(noise, img, title + '_map_noise', out_dir, vmin, vmax)
+    ph.plot_raft_map(dnoise, img, title + '_map_dnoise', out_dir, vmin, vmax)
 
     return ph.plot_histogram_all_one_binning(mean, noise, dnoise, title, out_dir,
                                              bin_num, img.ccd_num, omit_rebs, read_rebs)
@@ -67,7 +66,7 @@ def analyze_single_img(img, title='', out_dir=None, omit_rebs=[]):
 
 def analyze_run(run, imgtype="BIAS", db='Dev', site='BNL', prodServer='Dev',
                 appSuffix='-jrb', num_img=0, omit_rebs=[],
-                out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/Results/'):
+                out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/RTM-2_results/'):
     """ Analyze and plot results for the whole run. """
 
     if not out_dir.endswith('/'):
@@ -84,7 +83,7 @@ def analyze_run(run, imgtype="BIAS", db='Dev', site='BNL', prodServer='Dev',
     ccd_list = eR.raftContents(rO.raft)
 
     print 'Loaded %i images totaling %i files.' % (
-        len(obs_dict), sum(len(x) for x in obs_dict))
+        len(obs_dict), sum(len(x) for x in obs_dict.values()))
 
     num_img_ = num_img
     if num_img_ == 0 or num_img_ > len(obs_dict):
