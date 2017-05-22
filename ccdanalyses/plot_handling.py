@@ -7,12 +7,12 @@ import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
-def plot_overscan(overscan, fl, TITLE, OUT_DIR):
+def plot_overscan(overscan, img, TITLE, OUT_DIR):
     """ plot overscan in 9x2 plots with 16 channels """
     fig = plt.figure(figsize=(20, 20))
     gs0 = gridspec.GridSpec(3, 3)
 
-    for i, f in enumerate(fl):
+    for i, f in enumerate(img):
         x = f.dev_index % 3
 
         gs = gridspec.GridSpecFromSubplotSpec(
@@ -49,12 +49,12 @@ def plot_overscan(overscan, fl, TITLE, OUT_DIR):
     plt.close(fig)
 
 
-def plot_overscan_diff(overscan, fl, TITLE, OUT_DIR):
+def plot_overscan_diff(overscan, img, TITLE, OUT_DIR):
     """ plot overscan with subtracted 7th / 17th channel """
     fig = plt.figure(figsize=(20, 20))
     gs0 = gridspec.GridSpec(3, 3)
 
-    for i, f in enumerate(fl):
+    for i, f in enumerate(img):
         x = f.dev_index % 3
 
         gs = gridspec.GridSpecFromSubplotSpec(
@@ -93,11 +93,11 @@ def plot_overscan_diff(overscan, fl, TITLE, OUT_DIR):
     plt.close(fig)
 
 
-def plot_mean_std_stddelta(m, n, nd, fl, TITLE, OUT_DIR):
+def plot_mean_std_stddelta(m, n, nd, img, TITLE, OUT_DIR):
     """ plot std vs. mean vs. std_delta (comparison) """
     fig = plt.figure(figsize=(15, 10))
 
-    for i, f in enumerate(fl):
+    for i, f in enumerate(img):
 
         ax1 = plt.subplot(3, 3, f.dev_index + 1)
         lns1 = ax1.plot(m[i], 'o', color='green', label='offset')
@@ -357,11 +357,11 @@ def plot_one_run_summary(f, OUT_DIR, SUPTITLE="Run summary"):
     plot_summary(data, run, OUT_DIR, SUPTITLE)
 
 
-def plot_cor_ccd(a, fl, TITLE, OUT_DIR):
+def plot_cor_ccd(a, img, TITLE, OUT_DIR):
     fig = plt.figure(figsize=(15, 15))
     seg = [0, 7, 8, 15]
     lab = ["0", "7", "10", "17"]
-    for i, f in enumerate(fl):
+    for i, f in enumerate(img):
         ax1 = plt.subplot(3, 3, f.dev_index + 1)
 
         i_min = 16 * i
@@ -383,23 +383,23 @@ def plot_cor_ccd(a, fl, TITLE, OUT_DIR):
     plt.close(fig)
 
 
-def plot_cor_all(a, fl, TITLE, OUT_DIR):
+def plot_cor_all(a, img, TITLE, OUT_DIR):
     fig = plt.figure(figsize=(15, 15))
     im = plt.imshow(a, interpolation='nearest', cmap='jet', vmin=0, vmax=0.2)
     seg = np.arange(0, len(a), 16)
-    r = fl.ccd_num / 9.0
+    r = img.ccd_num / 9.0
     plt.xticks(seg)
     plt.yticks(seg)
 
-    for i, f in enumerate(fl):
+    for i, f in enumerate(img):
         plt.text(-10 * r, 8 + 16 * i, f.dev_name,
                  size=15, verticalalignment='center')
 
-    widthB = 54 / fl.ccd_num
+    widthB = 54 / img.ccd_num
     widthB = str(widthB)
 
-    for i in np.arange(0, fl.ccd_num, 3):
-        REB = 'REB' + fl[i].dev_name[0:1]
+    for i in np.arange(0, img.ccd_num, 3):
+        REB = 'REB' + img[i].dev_name[0:1]
         plt.annotate(REB, xy=(-11 * r, 24 + i * 16), xytext=(-18 * r, 24 + i * 16), xycoords='data',
                      fontsize=20, annotation_clip=False, ha='center', va='center',
                      arrowprops=dict(arrowstyle='-[, widthB=%s, lengthB=1.5' % widthB, lw=2.0))
