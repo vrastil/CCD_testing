@@ -10,7 +10,6 @@ from . import data_handling as dh
 from . import plot_handling as ph
 from . import file_handling as fh
 
-
 def analyze_single_img(img, title='', out_dir=None, omit_rebs=[]):
     """ Analyze and plot results of single image.
     img:	ImgInfo storing files of one image
@@ -50,62 +49,14 @@ def analyze_single_img(img, title='', out_dir=None, omit_rebs=[]):
     ph.plot_cor_all(corcoef, img, title, out_dir)
     ph.plot_cor_ccd(corcoef, img, title, out_dir)
 
+    for i, dat in enumerate(data[0:3]):
+        key = names[i]
+        vmin = np.percentile(dat, 10)
+        vmax = np.percentile(dat, 90)
+        ph.plot_raft_map(dat, img, key, out_dir, vmin, vmax)
+
     return ph.plot_histogram_all_one_binning(mean, noise, dnoise, title, out_dir,
                                              bin_num, img.ccd_num, omit_rebs, read_rebs)
-
-
-
-def get_raft_maps(run_dir, keys, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/Raft_maps/', values=None):
-    """ load data and plots results (raft maps) from run_dir, try to load all data with names in list of keys,
-    and if dictionary of min and max values is present, use them for plotting
-
-     keys:   list of keys
-     values: dictionary { key : (vmin, vmax) }
-     """
-    if values is None:
-        values = {}
-
-    if not run_dir.endswith('/'):
-        run_dir += '/'
-
-    if not out_dir.endswith('/'):
-        out_dir += '/'
-
-    print 'Loading files...'
-    all_files_info = []
-    for a_file, subdir in fh.get_files_in_traverse_dir(run_dir, '*eotest_results.fits'):
-        try:
-            subdir = subdir.split('/')
-            subdir = subdir[0] + '/' + subdir[1] +'/' #only v and vnum
-        except:
-            subdir = ''
-        all_files_info.append(fh.FileInfo(a_file, subdir))
-
-    img_v = {}
-    for file_info in all_files_info:
-        if file_info.subdir not in img_v:
-            img_v[file_info.subdir] = fh.ImgInfo()
-        img_v[file_info.subdir].add_img(file_info)
-    print 'Loaded %i files.' % len(all_files_info)
-
-    for img in img_v.itervalues():
-        out_dir_ = out_dir + str(img.run) + '/' + img.subdir
-        if not os.path.exists(out_dir_):
-            print "Creating outdir '%s'" % out_dir_
-            os.makedirs(out_dir_)
-
-        print "Plotting..."
-        for key in keys:
-            data = dh.load_data(img, key)
-            if data is not None:
-                if key in values:
-                    vmin, vmax = values[key]
-                else:
-                    vmin = np.percentile(data, 10)
-                    vmax = np.percentile(data, 90)
-                ph.plot_raft_map(data, img, key, out_dir_, vmin, vmax)
-
-    print "Everything done!"
 
 
 def analyze_run(run, imgtype="BIAS", db='Dev', site='BNL', prodServer='Dev',
@@ -152,11 +103,11 @@ def analyze_run(run, imgtype="BIAS", db='Dev', site='BNL', prodServer='Dev',
             break
 
     print "All images from run processed!\nCreating summary file and plot..."
-    f_hist_file = out_dir + key + 'hist_summary.dat'
+    f_hist_file = out_dir + 'hist_summary.dat'
     f_hist = open(f_hist_file, 'w')
     f_hist.write(hist_summary)
     f_hist.close()
-    ph.plot_one_run_summary(f_hist_file, out_dir + key)
+    ph.plot_one_run_summary(f_hist_file, out_dir)
 
     step = 'collect_raft_results'
     print 'Step: %s\nLoading images...'
@@ -206,18 +157,3 @@ def compare_runs(OUT_DIR='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/R
     f_hist.close()
     ph.plot_summary(y_stat, x_run, OUT_DIR)
     print "Everything done!"
-
-
-def load_npy(info_txt):
-    """  """
-    with open(info_txt, 'r') as f:
-        content = f.readlines()
-    lines = []
-    for x in content:
-        if x.startswith('\t'): lines.append(x)
-    lines = [''.join(x.split()) for x in lines]
-    fli = [fh.FileInfo(f, '') for f in lines]
-
-    img = fh.ImgInfo()
-    for fl in fli:
-        img.add_img(fl)

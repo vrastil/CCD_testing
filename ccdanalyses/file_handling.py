@@ -1,3 +1,4 @@
+import os, fnmatch
 from astropy.io import fits
 
 def load_runs(a_file):
@@ -6,6 +7,19 @@ def load_runs(a_file):
     tmp = o_file.read().splitlines()
     o_file.close()
     return tmp
+
+def get_files_in_traverse_dir(a_dir, a_file):
+    """ return list of all files in directory and its subdirectories \
+    which matches 'a_file' and its subdirectory path, support Unix \
+    filename pattern matching ('*', '?', [seq], [!seq]) """
+
+    ls_file = []
+    for root, dirs, files in os.walk(a_dir):
+        for name in files:
+            if fnmatch.fnmatch(name, a_file):
+                subdir = root.replace(a_dir, '')
+                ls_file.append((os.path.join(root, name), subdir))
+    return ls_file
 
 _DEV_INDEX = ['S22', 'S12', 'S02', 'S21', 'S11', 'S01', 'S20', 'S10', 'S00']
 _DEV_INDEX_TR = ['S22', 'S21', 'S20', 'S12', 'S11', 'S10', 'S02', 'S01', 'S00']
