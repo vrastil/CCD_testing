@@ -59,7 +59,7 @@ def analyze_single_img(img, title='', out_dir=None, omit_rebs=[]):
     vmax = np.percentile(noise, 90)
     ph.plot_raft_map(noise, img, title + '_map_noise', out_dir, vmin, vmax)
     ph.plot_raft_map(dnoise, img, title + '_map_dnoise_2', out_dir, vmin, vmax)
-    vmin = np.percentile(dnoise, 10)
+    vmin = np.percentile(dnoise, 22.5)
     vmax = np.percentile(dnoise, 90)
     ph.plot_raft_map(dnoise, img, title + '_map_dnoise', out_dir, vmin, vmax)
 
