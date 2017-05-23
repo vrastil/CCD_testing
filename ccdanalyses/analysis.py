@@ -59,8 +59,8 @@ def analyze_single_img(img, title='', out_dir=None, omit_rebs=[]):
     vmax = np.percentile(noise, 90)
     ph.plot_raft_map(noise, img, title + '_map_noise', out_dir, vmin, vmax)
     ph.plot_raft_map(dnoise, img, title + '_map_dnoise_2', out_dir, vmin, vmax)
-    vmin = np.percentile(noise, 10)
-    vmax = np.percentile(noise, 90)
+    vmin = np.percentile(dnoise, 10)
+    vmax = np.percentile(dnoise, 90)
     ph.plot_raft_map(dnoise, img, title + '_map_dnoise', out_dir, vmin, vmax)
 
     return ph.plot_histogram_all_one_binning(mean, noise, dnoise, title, out_dir,
@@ -68,7 +68,7 @@ def analyze_single_img(img, title='', out_dir=None, omit_rebs=[]):
 
 
 def analyze_run(run, imgtype="BIAS", db='Dev', site='BNL', prodServer='Dev',
-                appSuffix='-jrb', num_img=0, omit_rebs=[],
+                appSuffix='-jrb', num_img=1, omit_rebs=[],
                 out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/RTM-2_results/'):
     """ Analyze and plot results for the whole run. """
 
