@@ -72,6 +72,9 @@ def analyze_run(run, imgtype="BIAS", db='Dev', site='BNL', prodServer='Dev',
                 out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/RTM-2_results/'):
     """ Analyze and plot results for the whole run. """
 
+    print '*******************'
+    print 'Analyzing run %s' % run
+    print '*******************'
     if not out_dir.endswith('/'):
         out_dir += '/'
     out_dir += run + '/'
