@@ -2,7 +2,11 @@
 import numpy as np
 from astropy.io import fits
 
+from . import file_handling as fh
 from . import misc
+
+from raft_observation import raft_observation
+from exploreRaft import exploreRaft
 
 def slice_sort_seg(o_fits_file):
     """ take only segment data ([1:17]) and sort them"""
@@ -82,3 +86,37 @@ def load_data(img, data_key):
         return data
     else:
         return None
+
+def load_noises_e():
+
+    imgtype = "BIAS"; db = 'Dev'; site = 'BNL'; prodServer = 'Dev'; appSuffix = '-jrb'
+
+    runs = {'4978D' : 4.50, '4987D' : 4.25, '4986D' : 3.75,
+            '4979D' : 3.50, '5001D' : 3.00, '4985D' : 2.50,
+            '4963D' : 4.00}
+    step = 'fe55_raft_analysis'
+
+    noises_e = {}
+
+    for run in runs.iterkeys():
+        rO = raft_observation(run=run, step=step, db=db, site=site,
+                              prodServer=prodServer, appSuffix=appSuffix)
+        obs_dict = rO.find()
+        eR = exploreRaft(db=db, prodServer=prodServer, appSuffix=appSuffix)
+        ccd_list = eR.raftContents(rO.raft)
+
+        results = set()
+        for val in obs_dict.itervalues():
+            for a_file in val:
+                if 'eotest_results' in a_file:
+                    results.add(a_file)
+
+        img = fh.ImgInfo(list(results), ccd_list, run=run, img_type=imgtype)
+        gain = load_data(img, 'gain')
+
+        a_dir = '/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/RTM-2_results/' + run
+        a_file = 'noise.npy'
+        noise = fh.get_files_in_traverse_dir(a_dir, a_file)[0][0]
+        noise = np.load(noise)
+        noises_e[run] = noise*gain
+    return noises_e
