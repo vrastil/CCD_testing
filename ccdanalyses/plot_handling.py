@@ -399,7 +399,7 @@ def plot_cor_all(a, img, TITLE, OUT_DIR, vmin=0, vmax=0.2):
     widthB = str(widthB)
 
     for i in np.arange(0, img.ccd_num, 3):
-        REB = 'REB' + img[i].dev_name[0:1]
+        REB = 'REB' + img[i].dev_name[1:2]
         plt.annotate(REB, xy=(-11 * r, 24 + i * 16), xytext=(-18 * r, 24 + i * 16), xycoords='data',
                      fontsize=20, annotation_clip=False, ha='center', va='center',
                      arrowprops=dict(arrowstyle='-[, widthB=%s, lengthB=1.5' % widthB, lw=2.0))
