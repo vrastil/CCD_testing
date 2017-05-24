@@ -357,7 +357,7 @@ def plot_one_run_summary(f, OUT_DIR, SUPTITLE="Run summary"):
     plot_summary(data, run, OUT_DIR, SUPTITLE)
 
 
-def plot_cor_ccd(a, img, TITLE, OUT_DIR):
+def plot_cor_ccd(a, img, TITLE, OUT_DIR, vmin=0, vmax=0.2):
     fig = plt.figure(figsize=(15, 15))
     seg = [0, 7, 8, 15]
     lab = ["0", "7", "10", "17"]
@@ -367,7 +367,7 @@ def plot_cor_ccd(a, img, TITLE, OUT_DIR):
         i_min = 16 * i
         i_max = i_min + 16
         aa = a[i_min:i_max, i_min:i_max]
-        im = plt.imshow(aa, interpolation='nearest', cmap='jet', vmin=0, vmax=0.2)
+        im = plt.imshow(aa, interpolation='nearest', cmap='jet', vmin=vmin, vmax=vmax)
         ax1.set_title(f.dev_name)
         ax1.set_xlim(15.5, -0.5)
         ax1.set_ylim(-0.5, 15.5)
