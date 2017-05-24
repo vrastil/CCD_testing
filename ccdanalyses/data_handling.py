@@ -114,7 +114,7 @@ def load_noises_e():
 
         img = fh.ImgInfo(list(results), ccd_list, run=run, img_type=imgtype)
         gain = load_data(img, 'gain')
-        if gains != None:
+        if gain != None:
             print 'gain: True'
         else:
             print 'gain: False'
@@ -124,7 +124,7 @@ def load_noises_e():
         a_file = 'noise.npy'
         noise = fh.get_files_in_traverse_dir(a_dir, a_file)[0][0]
         noise = np.load(noise)
-        if gains != None:
+        if noise != None:
             print 'noise: True'
         else:
             print 'noise: False'
