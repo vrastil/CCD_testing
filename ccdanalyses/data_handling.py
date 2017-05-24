@@ -99,6 +99,7 @@ def load_noises_e():
     noises_e = {}
 
     for run in runs.iterkeys():
+        print "Loading data for run '%s'..." % run
         rO = raft_observation(run=run, step=step, db=db, site=site,
                               prodServer=prodServer, appSuffix=appSuffix)
         obs_dict = rO.find()
@@ -113,10 +114,20 @@ def load_noises_e():
 
         img = fh.ImgInfo(list(results), ccd_list, run=run, img_type=imgtype)
         gain = load_data(img, 'gain')
+        if gains != None:
+            print 'gain: True'
+        else:
+            print 'gain: False'
+            return None
 
         a_dir = '/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/RTM-2_results/' + run
         a_file = 'noise.npy'
         noise = fh.get_files_in_traverse_dir(a_dir, a_file)[0][0]
         noise = np.load(noise)
+        if gains != None:
+            print 'noise: True'
+        else:
+            print 'noise: False'
+            return None
         noises_e[run] = noise*gain
     return noises_e
