@@ -87,13 +87,14 @@ def load_data(img, data_key):
     else:
         return None
 
-def load_noises_e():
+def load_noises_e(runs=None):
 
     imgtype = "BIAS"; db = 'Dev'; site = 'BNL'; prodServer = 'Dev'; appSuffix = '-jrb'
 
-    runs = {'4978D' : 4.50, '4987D' : 4.25, '4986D' : 3.75,
-            '4979D' : 3.50, '5001D' : 3.00, '4985D' : 2.50,
-            '4963D' : 4.00}
+    if runs == None:
+        runs = {'4978D' : 4.50, '4987D' : 4.25, '4986D' : 3.75,
+                '4979D' : 3.50, '5001D' : 3.00, '4985D' : 2.50,
+                '4963D' : 4.00}
     step = 'fe55_raft_analysis'
 
     noises_e = {}

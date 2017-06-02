@@ -187,3 +187,9 @@ def compare_runs(OUT_DIR='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/R
     f_hist.close()
     ph.plot_summary(y_stat, x_run, OUT_DIR)
     print "Everything done!"
+
+
+if __name__ == "__main__":
+    run = '4963D'
+    analyze_run(run)
+
