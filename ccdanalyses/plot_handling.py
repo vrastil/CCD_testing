@@ -411,6 +411,25 @@ def plot_cor_all(a, img, TITLE, OUT_DIR, vmin=0, vmax=0.2):
     plt.savefig(OUT_DIR + TITLE + '_cor_all.png')
     plt.close(fig)
 
+def plot_cor_ccd_mean(a, img, TITLE, OUT_DIR, vmin=-1, vmax=1):
+    fig = plt.figure(figsize=(15, 15))
+    im = plt.imshow(a, interpolation='nearest', cmap='jet', vmin=vmin, vmax=vmax)
+
+    loc = arange(img.ccd_num)
+    labels = []
+    for fli in img:
+        labels.append(fli.dev_name)
+
+    plt.xticks(loc, labels)
+    plt.yticks(loc, labels)
+
+    fig.subplots_adjust(right=0.82)
+    cbar_ax = fig.add_axes([0.85, 0.155, 0.05, 0.695])
+    fig.colorbar(im, cax=cbar_ax)
+    fig.suptitle("Correlations of means of CCDs" + TITLE, y=0.91, size=20)
+    plt.savefig(OUT_DIR + TITLE + '_cor_ccd_mean.png')
+    plt.close(fig)
+
 def plot_gains(gains, gain_ref, TITLES, OUT_DIR):
     """ plot gains with respect to the reference gain,
     whre reference gain is number => gains[gain_ref]"""
@@ -491,3 +510,54 @@ def plot_raft_map(data, img, TITLE, OUTDIR, vmin=None, vmax=None):
     plt.savefig(OUTDIR + TITLE + '.png')
     plt.show()
     plt.close(fig)
+
+def plot_voltage_all(data, imgs, title, out_dir, suptitle=''):
+    if suptitle == '':
+        suptitle = title
+    fig = plt.figure(figsize=(18, 21))
+
+    cmap = plt.get_cmap('gist_ncar')
+    colors = [cmap(i) for i in np.linspace(0, 1, 16)]
+
+    for k in range(9):
+        ax1 = plt.subplot(3, 3, imgs[0][k].dev_index + 1)
+        ax1.set_title(imgs[0][k].dev_name)
+        for j in range(16):
+            y = []
+            for i in range(len(x)):
+                y.append(data[i][k][j])
+            plt.plot(x, y, label='Segment %i' % j, color=colors[j])
+
+    fig.suptitle(suptitle + '; all segments', y=1.03, size=20)
+    plt.legend(loc='lower left', bbox_to_anchor=(0.7, 1.1), ncol=4)
+    plt.subplots_adjust(bottom=0.05, left=0.05)
+    plt.savefig(out_dir + title + '_all.png')
+
+def plot_voltage_ccd(data, imgs, title, out_dir, suptitle=''):
+    if suptitle == '':
+        suptitle = title
+    fig = plt.figure(figsize=(15, 15))
+    for k in range(9):
+        ax1 = plt.subplot(3, 3, imgs[0][k].dev_index + 1)        
+        ax1.set_title(imgs[0][k].dev_name)
+        y = []
+        for i in range(len(x)):
+            y.append(np.mean(data[i][k]))
+                    
+        plt.plot(x, y)
+        
+    fig.suptitle(suptitle + '; mean of segments, per CCD', y=0.94, size=20)
+    plt.savefig(out_dir + title + '_CCD.png')
+
+def plot_voltage_raft(data, imgs, title, out_dir, suptitle=''):
+    if suptitle == '':
+        suptitle = title
+    fig = plt.figure(figsize=(7, 7))
+    y = []
+    for i in range(len(x)):
+        y.append(np.mean(data[i]))
+    plt.plot(x, y)
+
+    fig.suptitle(suptitle + '; mean of all segments', y=0.96, size=20)
+    plt.savefig(out_dir + title + '_raft.png')
+

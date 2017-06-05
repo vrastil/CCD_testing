@@ -119,10 +119,39 @@ def load_noises_e(runs):
         a_file = 'noise.npy'
         noise = fh.get_files_in_traverse_dir(a_dir, a_file)[0][0]
         noise = np.load(noise)
-        if noise != None:
+        if noise is not None:
             print 'noise: True'
         else:
             print 'noise: False'
             return None
         noises_e.append(noise*gain)
     return noises_e
+
+def make_tab_corcoef_voltage(data_l):
+    data = np.array(data_l)
+    x, y, z = data.shape; l = y*z
+    data = data.reshape(x, l)
+    a = np.array([np.corrcoef(data[:, i], data[:, j])
+                  for i in range(l) for j in range(l)])
+    aa = np.array([a[i, 0, 1] for i in range(l * l)])
+    aa.shape = ((l, l))
+    return aa
+
+def make_tab_corcoef_voltage_mean(data_l):
+    data = np.array(data_l)
+    x, y, z = data.shape
+    mean = []
+    for i in range(x):
+        mean_ = []
+        for j in range(y):
+            mean_.append(np.mean(data[i, j]))
+        mean.append(mean_)
+    mean = np.array(mean)
+
+    a = np.array([np.corrcoef(mean[:, i], mean[:, j])
+                  for i in range(y) for j in range(y)])
+
+    aa = np.array([a[i, 0, 1] for i in range(y * y)])
+    aa.shape = ((y, y))
+    return aa
+

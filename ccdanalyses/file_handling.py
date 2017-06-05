@@ -21,6 +21,11 @@ def get_files_in_traverse_dir(a_dir, a_file):
                 ls_file.append((os.path.join(root, name), subdir))
     return ls_file
 
+def create_dir(out_dir):
+    if not os.path.exists(out_dir):
+    print "Creating outdir '%s'" % out_dir
+    os.makedirs(out_dir)
+
 _DEV_INDEX = ['S22', 'S12', 'S02', 'S21', 'S11', 'S01', 'S20', 'S10', 'S00']
 _DEV_INDEX_TR = ['S22', 'S21', 'S20', 'S12', 'S11', 'S10', 'S02', 'S01', 'S00']
 

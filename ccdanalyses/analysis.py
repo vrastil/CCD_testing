@@ -18,9 +18,7 @@ def analyze_single_img(img, title='', out_dir=None, omit_rebs=[]):
     img:	ImgInfo storing files of one image
     out_dir:	output directory"""
 
-    if not os.path.exists(out_dir):
-        print "Creating outdir '%s'" % out_dir
-        os.makedirs(out_dir)
+    fh.create_dir(out_dir)
 
     read_rebs = set()
     for fli in img:
