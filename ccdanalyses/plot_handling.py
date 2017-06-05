@@ -514,7 +514,7 @@ def plot_raft_map(data, img, TITLE, OUTDIR, vmin=None, vmax=None):
 def plot_voltage_all(x, data, imgs, title, out_dir, suptitle=''):
     if suptitle == '':
         suptitle = title
-    fig = plt.figure(figsize=(18, 21))
+    fig = plt.figure(figsize=(20, 24))
 
     cmap = plt.get_cmap('gist_ncar')
     colors = [cmap(i) for i in np.linspace(0, 1, 16)]
@@ -528,10 +528,11 @@ def plot_voltage_all(x, data, imgs, title, out_dir, suptitle=''):
                 y.append(data[i][k][j])
             plt.plot(x, y, label='Segment %i' % j, color=colors[j])
 
-    fig.suptitle(suptitle + '; all segments', y=1.03, size=20)
-    plt.legend(loc='lower left', bbox_to_anchor=(0.7, 1.1), ncol=4)
-    plt.subplots_adjust(bottom=0.05, left=0.05)
+    fig.suptitle(suptitle + '; all segments', y=0.99, size=20)
+    plt.legend(loc='lower left', bbox_to_anchor=(0.87, 1.1), ncol=4)
+    plt.subplots_adjust(bottom=0.04, left=0.04, top=0.88, right=0.96, wspace=0.1, hspace=0.1)
     plt.savefig(out_dir + title + '_all.png')
+    plt.close(fig)
 
 def plot_voltage_ccd(x, data, imgs, title, out_dir, suptitle=''):
     if suptitle == '':
@@ -548,6 +549,7 @@ def plot_voltage_ccd(x, data, imgs, title, out_dir, suptitle=''):
         
     fig.suptitle(suptitle + '; mean of segments, per CCD', y=0.94, size=20)
     plt.savefig(out_dir + title + '_CCD.png')
+    plt.close(fig)
 
 def plot_voltage_raft(x, data, imgs, title, out_dir, suptitle=''):
     if suptitle == '':
@@ -560,4 +562,5 @@ def plot_voltage_raft(x, data, imgs, title, out_dir, suptitle=''):
 
     fig.suptitle(suptitle + '; mean of all segments', y=0.96, size=20)
     plt.savefig(out_dir + title + '_raft.png')
+    plt.close(fig)
 
