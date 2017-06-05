@@ -426,7 +426,7 @@ def plot_cor_ccd_mean(a, img, TITLE, OUT_DIR, vmin=-1, vmax=1):
     fig.subplots_adjust(right=0.82)
     cbar_ax = fig.add_axes([0.85, 0.155, 0.05, 0.695])
     fig.colorbar(im, cax=cbar_ax)
-    fig.suptitle("Correlations of means of CCDs" + TITLE, y=0.91, size=20)
+    fig.suptitle("Correlations of means of CCDs " + TITLE, y=0.91, size=20)
     plt.savefig(OUT_DIR + TITLE + '_cor_ccd_mean.png')
     plt.close(fig)
 
