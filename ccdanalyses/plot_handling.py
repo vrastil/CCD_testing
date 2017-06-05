@@ -415,7 +415,7 @@ def plot_cor_ccd_mean(a, img, TITLE, OUT_DIR, vmin=-1, vmax=1):
     fig = plt.figure(figsize=(15, 15))
     im = plt.imshow(a, interpolation='nearest', cmap='jet', vmin=vmin, vmax=vmax)
 
-    loc = arange(img.ccd_num)
+    loc = range(img.ccd_num)
     labels = []
     for fli in img:
         labels.append(fli.dev_name)
