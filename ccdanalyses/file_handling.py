@@ -134,3 +134,14 @@ def load_info(info_txt):
     img = ImgInfo(fl_ls, ccd_list, run=run, img_type=img_type, date=date)
     return img
 
+def load_imgs(runs, in_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/RTM-2_results/'):
+    """ from list of run numbers load ImgInfo """
+    files_i = []
+    imgs = []
+    a_file = 'img_info.txt'
+    for run in runs:
+        a_dir = in_dir + run
+        files_i.append(get_files_in_traverse_dir(a_dir, a_file)[0][0])
+    for a_file in files_i:
+        imgs.append(load_info(a_file))
+    return imgs

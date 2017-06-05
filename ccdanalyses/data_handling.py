@@ -88,10 +88,10 @@ def load_data(img, data_key):
         return None
 
 def load_noises_e(runs):
-
+    """ for list of runs return list of noises in e- """
     imgtype = "BIAS"; db = 'Dev'; site = 'BNL'; prodServer = 'Dev'; appSuffix = '-jrb'
     step = 'fe55_raft_analysis'
-    noises_e = {}
+    noises_e = []
 
     for run in runs:
         print "Loading data for run '%s'..." % run
@@ -109,7 +109,7 @@ def load_noises_e(runs):
 
         img = fh.ImgInfo(list(results), ccd_list, run=run, img_type=imgtype)
         gain = load_data(img, 'gain')
-        if gain != None:
+        if gain is not None:
             print 'gain: True'
         else:
             print 'gain: False'
@@ -124,5 +124,5 @@ def load_noises_e(runs):
         else:
             print 'noise: False'
             return None
-        noises_e[run] = noise*gain
+        noises_e.append(noise*gain)
     return noises_e
