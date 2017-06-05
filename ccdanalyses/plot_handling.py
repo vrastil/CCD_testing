@@ -511,7 +511,7 @@ def plot_raft_map(data, img, TITLE, OUTDIR, vmin=None, vmax=None):
     plt.show()
     plt.close(fig)
 
-def plot_voltage_all(data, imgs, title, out_dir, suptitle=''):
+def plot_voltage_all(x, data, imgs, title, out_dir, suptitle=''):
     if suptitle == '':
         suptitle = title
     fig = plt.figure(figsize=(18, 21))
@@ -533,7 +533,7 @@ def plot_voltage_all(data, imgs, title, out_dir, suptitle=''):
     plt.subplots_adjust(bottom=0.05, left=0.05)
     plt.savefig(out_dir + title + '_all.png')
 
-def plot_voltage_ccd(data, imgs, title, out_dir, suptitle=''):
+def plot_voltage_ccd(x, data, imgs, title, out_dir, suptitle=''):
     if suptitle == '':
         suptitle = title
     fig = plt.figure(figsize=(15, 15))
@@ -549,7 +549,7 @@ def plot_voltage_ccd(data, imgs, title, out_dir, suptitle=''):
     fig.suptitle(suptitle + '; mean of segments, per CCD', y=0.94, size=20)
     plt.savefig(out_dir + title + '_CCD.png')
 
-def plot_voltage_raft(data, imgs, title, out_dir, suptitle=''):
+def plot_voltage_raft(x, data, imgs, title, out_dir, suptitle=''):
     if suptitle == '':
         suptitle = title
     fig = plt.figure(figsize=(7, 7))
