@@ -9,19 +9,19 @@ def sort_runs(runs):
     runs = list(runs)
     return x, runs
 
-# runs = {'4978D' : 4.50, '4987D' : 4.25, '4986D' : 3.75,
-#        '4979D' : 3.50, '5001D' : 3.00, '4985D' : 2.50,
-#        '4963D' : 4.00}
+runs = {'4978D' : 4.50, '4987D' : 4.25, '4986D' : 3.75,
+        '4979D' : 3.50, '5001D' : 3.00, '4985D' : 2.50,
+        '4963D' : 4.00}
 
 # for all voltage data
-runs = {'5022D' : 30.5, '4963D' : 30, '5016D' : 29.5, '5017D' : 29.0, '5019D' : 28.5}
+#runs = {'5022D' : 30.5, '4963D' : 30, '5016D' : 29.5, '5017D' : 29.0, '5019D' : 28.5}
 x, runs = sort_runs(runs)
-out_dir = '/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/VOD/'
+out_dir = '/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/VOG/'
 fh.create_dir(out_dir)
 imgs = fh.load_imgs(runs)
 
 title = 'noise'
-suptitle = 'noise [e-] vs OD [V]'
+suptitle = 'noise [e-] vs OG [V]'
 
 print 'Getting data...'
 data = dh.load_noises_e(runs)
@@ -33,4 +33,4 @@ ph.plot_voltage_ccd(x, data, imgs, title, out_dir, suptitle=suptitle)
 ph.plot_voltage_raft(x, data, imgs, title, out_dir, suptitle=suptitle)
 ph.plot_cor_ccd(aa, imgs[0], title, out_dir, vmin=-0.7, vmax=0.7)
 ph.plot_cor_all(aa, imgs[0], title, out_dir, vmin=-0.7, vmax=0.7)
-ph.plot_cor_ccd_mean(aa_m, imgs[0], title, out_dir, vmin=-1, vmax=1)
+ph.plot_cor_ccd_mean(aa_m, imgs[0], title, out_dir, vmin=0, vmax=1)
