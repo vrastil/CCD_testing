@@ -26,8 +26,8 @@ _KEY_SUBDIR = {
     }
 
 RUNS_OG = {'4978D' : 4.50, '4987D' : 4.25, '4986D' : 3.75,
-        '4979D' : 3.50, '5001D' : 3.00, '4985D' : 2.50,
-        '4963D' : 4.00}
+           '4979D' : 3.50, '5001D' : 3.00, '4985D' : 2.50,
+           '4963D' : 4.00}
 
 RUNS_OD = {'5022D' : 30.5, '4963D' : 30, '5016D' : 29.5, '5017D' : 29.0, '5019D' : 28.5}
 
@@ -68,7 +68,7 @@ def load_multiple_summary(runs, key, base_dir='/gpfs/mnt/gpfs01/astro/workarea/c
     return data
 
 def analyze_voltage(key, runs=RUNS_OD, title=None, suptitle=None, vmin=-0.6, vmax=0.6,
-                    out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/VOD'):
+                    out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/VOD/'):
     x, runs = sort_runs(runs)
     fh.create_dir(out_dir)
     imgs = fh.load_imgs(runs)
