@@ -12,8 +12,8 @@ def sort_runs(runs):
     runs = list(runs)
     return x, runs
 
-_DEV_INDEX_TR = ['S22', 'S21', 'S20', 'S12', 'S11', 'S10', 'S02', 'S01', 'S00']
-_KEY_SUBDIR = {
+DEV_INDEX_TR = ['S22', 'S21', 'S20', 'S12', 'S11', 'S10', 'S02', 'S01', 'S00']
+KEY_SUBDIR = {
     "full_well" : "flat_pairs_raft_analysis",
     "cti_high_parallel" : "cte_raft",
     "cti_low_serial" : "cte_raft",
@@ -24,6 +24,8 @@ _KEY_SUBDIR = {
     "total_noise" : "read_noise_raft",
     "gain" : "fe55_raft_analysis"
     }
+
+CTI_KEYS = ["cti_high_parallel", "cti_low_serial", "cti_high_serial", "cti_low_parallel"]
 
 RUNS_OG = {'4978D' : 4.50, '4987D' : 4.25, '4986D' : 3.75,
            '4979D' : 3.50, '5001D' : 3.00, '4985D' : 2.50,
@@ -47,14 +49,14 @@ def load_summary(a_file, key):
     # get ["slot", "amp"] = key
     data = np.zeros((9, 16))
     for slot, amp, key in data_key:
-        slot_ = list(reversed(_DEV_INDEX_TR)).index(slot)
+        slot_ = list(reversed(DEV_INDEX_TR)).index(slot)
         data[slot_, amp-1] = key
 
     return data
 
 def load_multiple_summary(runs, key, base_dir='/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-005-Dev/'):
-    if key in _KEY_SUBDIR:
-        key_subdir = _KEY_SUBDIR[key]
+    if key in KEY_SUBDIR:
+        key_subdir = KEY_SUBDIR[key]
     else:
         print "ERROR! Unknown key '%s'" % key
         return
@@ -68,13 +70,11 @@ def load_multiple_summary(runs, key, base_dir='/gpfs/mnt/gpfs01/astro/workarea/c
     return data
 
 def analyze_voltage(key, runs=RUNS_OD, title=None, suptitle=None, vmin=-0.6, vmax=0.6,
-                    out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/VOD/'):
+                    out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/VOG/'):
     x, runs = sort_runs(runs)
     fh.create_dir(out_dir)
     imgs = fh.load_imgs(runs)
 
-    #title = 'noise'
-    #suptitle = 'noise [e-] vs OG [V]'
     if title is None: title = key
     if suptitle is None: suptitle = title + ' vs OG [V]'
 
