@@ -7,12 +7,12 @@ import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
-def plot_overscan(overscan, fl, TITLE, OUT_DIR):
+def plot_overscan(overscan, img, TITLE, OUT_DIR):
     """ plot overscan in 9x2 plots with 16 channels """
     fig = plt.figure(figsize=(20, 20))
     gs0 = gridspec.GridSpec(3, 3)
 
-    for i, f in enumerate(fl):
+    for i, f in enumerate(img):
         x = f.dev_index % 3
 
         gs = gridspec.GridSpecFromSubplotSpec(
@@ -49,12 +49,12 @@ def plot_overscan(overscan, fl, TITLE, OUT_DIR):
     plt.close(fig)
 
 
-def plot_overscan_diff(overscan, fl, TITLE, OUT_DIR):
+def plot_overscan_diff(overscan, img, TITLE, OUT_DIR):
     """ plot overscan with subtracted 7th / 17th channel """
     fig = plt.figure(figsize=(20, 20))
     gs0 = gridspec.GridSpec(3, 3)
 
-    for i, f in enumerate(fl):
+    for i, f in enumerate(img):
         x = f.dev_index % 3
 
         gs = gridspec.GridSpecFromSubplotSpec(
@@ -93,11 +93,11 @@ def plot_overscan_diff(overscan, fl, TITLE, OUT_DIR):
     plt.close(fig)
 
 
-def plot_mean_std_stddelta(m, n, nd, fl, TITLE, OUT_DIR):
+def plot_mean_std_stddelta(m, n, nd, img, TITLE, OUT_DIR):
     """ plot std vs. mean vs. std_delta (comparison) """
     fig = plt.figure(figsize=(15, 10))
 
-    for i, f in enumerate(fl):
+    for i, f in enumerate(img):
 
         ax1 = plt.subplot(3, 3, f.dev_index + 1)
         lns1 = ax1.plot(m[i], 'o', color='green', label='offset')
@@ -357,17 +357,17 @@ def plot_one_run_summary(f, OUT_DIR, SUPTITLE="Run summary"):
     plot_summary(data, run, OUT_DIR, SUPTITLE)
 
 
-def plot_cor_ccd(a, fl, TITLE, OUT_DIR):
+def plot_cor_ccd(a, img, TITLE, OUT_DIR, vmin=0, vmax=0.2):
     fig = plt.figure(figsize=(15, 15))
     seg = [0, 7, 8, 15]
     lab = ["0", "7", "10", "17"]
-    for i, f in enumerate(fl):
+    for i, f in enumerate(img):
         ax1 = plt.subplot(3, 3, f.dev_index + 1)
 
         i_min = 16 * i
         i_max = i_min + 16
         aa = a[i_min:i_max, i_min:i_max]
-        im = plt.imshow(aa, interpolation='nearest', cmap='jet', vmin=0, vmax=0.2)
+        im = plt.imshow(aa, interpolation='nearest', cmap='jet', vmin=vmin, vmax=vmax)
         ax1.set_title(f.dev_name)
         ax1.set_xlim(15.5, -0.5)
         ax1.set_ylim(-0.5, 15.5)
@@ -383,23 +383,23 @@ def plot_cor_ccd(a, fl, TITLE, OUT_DIR):
     plt.close(fig)
 
 
-def plot_cor_all(a, fl, TITLE, OUT_DIR):
+def plot_cor_all(a, img, TITLE, OUT_DIR, vmin=0, vmax=0.2):
     fig = plt.figure(figsize=(15, 15))
-    im = plt.imshow(a, interpolation='nearest', cmap='jet', vmin=0, vmax=0.2)
+    im = plt.imshow(a, interpolation='nearest', cmap='jet', vmin=vmin, vmax=vmax)
     seg = np.arange(0, len(a), 16)
-    r = fl.ccd_num / 9.0
+    r = img.ccd_num / 9.0
     plt.xticks(seg)
     plt.yticks(seg)
 
-    for i, f in enumerate(fl):
+    for i, f in enumerate(img):
         plt.text(-10 * r, 8 + 16 * i, f.dev_name,
                  size=15, verticalalignment='center')
 
-    widthB = 54 / fl.ccd_num
+    widthB = 54 / img.ccd_num
     widthB = str(widthB)
 
-    for i in np.arange(0, fl.ccd_num, 3):
-        REB = 'REB' + fl[i].dev_name[0:1]
+    for i in np.arange(0, img.ccd_num, 3):
+        REB = 'REB' + img[i].dev_name[1:2]
         plt.annotate(REB, xy=(-11 * r, 24 + i * 16), xytext=(-18 * r, 24 + i * 16), xycoords='data',
                      fontsize=20, annotation_clip=False, ha='center', va='center',
                      arrowprops=dict(arrowstyle='-[, widthB=%s, lengthB=1.5' % widthB, lw=2.0))
@@ -409,6 +409,25 @@ def plot_cor_all(a, fl, TITLE, OUT_DIR):
     fig.colorbar(im, cax=cbar_ax)
     fig.suptitle("Overall correlations " + TITLE, y=0.91, size=20)
     plt.savefig(OUT_DIR + TITLE + '_cor_all.png')
+    plt.close(fig)
+
+def plot_cor_ccd_mean(a, img, TITLE, OUT_DIR, vmin=-1, vmax=1):
+    fig = plt.figure(figsize=(15, 15))
+    im = plt.imshow(a, interpolation='nearest', cmap='jet', vmin=vmin, vmax=vmax)
+
+    loc = range(img.ccd_num)
+    labels = []
+    for fli in img:
+        labels.append(fli.dev_name)
+
+    plt.xticks(loc, labels)
+    plt.yticks(loc, labels)
+
+    fig.subplots_adjust(right=0.82)
+    cbar_ax = fig.add_axes([0.85, 0.155, 0.05, 0.695])
+    fig.colorbar(im, cax=cbar_ax)
+    fig.suptitle("Correlations of means of CCDs " + TITLE, y=0.91, size=20)
+    plt.savefig(OUT_DIR + TITLE + '_cor_ccd_mean.png')
     plt.close(fig)
 
 def plot_gains(gains, gain_ref, TITLES, OUT_DIR):
@@ -488,6 +507,60 @@ def plot_raft_map(data, img, TITLE, OUTDIR, vmin=None, vmax=None):
     cbar_ax = fig.add_axes([0.87, 0.15, 0.05, 0.7])
     fig.colorbar(im, cax=cbar_ax)
     fig.suptitle(TITLE, y=0.98, size=19)
-    plt.savefig(OUTDIR + TITLE + '_map.png')
+    plt.savefig(OUTDIR + TITLE + '.png')
     plt.show()
     plt.close(fig)
+
+def plot_voltage_all(x, data, imgs, title, out_dir, suptitle=''):
+    if suptitle == '':
+        suptitle = title
+    fig = plt.figure(figsize=(20, 24))
+
+    cmap = plt.get_cmap('gist_ncar')
+    colors = [cmap(i) for i in np.linspace(0, 1, 16)]
+
+    for k in range(9):
+        ax1 = plt.subplot(3, 3, imgs[0][k].dev_index + 1)
+        ax1.set_title(imgs[0][k].dev_name)
+        for j in range(16):
+            y = []
+            for i in range(len(x)):
+                y.append(data[i][k][j])
+            plt.plot(x, y, label='Segment %i' % j, color=colors[j])
+
+    fig.suptitle(suptitle + '; all segments', y=0.99, size=20)
+    plt.legend(loc='lower left', bbox_to_anchor=(0.87, 1.1), ncol=4)
+    plt.subplots_adjust(bottom=0.04, left=0.04, top=0.88, right=0.96, wspace=0.1, hspace=0.1)
+    plt.savefig(out_dir + title + '_all.png')
+    plt.close(fig)
+
+def plot_voltage_ccd(x, data, imgs, title, out_dir, suptitle=''):
+    if suptitle == '':
+        suptitle = title
+    fig = plt.figure(figsize=(15, 15))
+    for k in range(9):
+        ax1 = plt.subplot(3, 3, imgs[0][k].dev_index + 1)        
+        ax1.set_title(imgs[0][k].dev_name)
+        y = []
+        for i in range(len(x)):
+            y.append(np.mean(data[i][k]))
+                    
+        plt.plot(x, y)
+        
+    fig.suptitle(suptitle + '; mean of segments, per CCD', y=0.94, size=20)
+    plt.savefig(out_dir + title + '_CCD.png')
+    plt.close(fig)
+
+def plot_voltage_raft(x, data, imgs, title, out_dir, suptitle=''):
+    if suptitle == '':
+        suptitle = title
+    fig = plt.figure(figsize=(7, 7))
+    y = []
+    for i in range(len(x)):
+        y.append(np.mean(data[i]))
+    plt.plot(x, y)
+
+    fig.suptitle(suptitle + '; mean of all segments', y=0.96, size=20)
+    plt.savefig(out_dir + title + '_raft.png')
+    plt.close(fig)
+

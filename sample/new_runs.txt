@@ -1,3 +1,0 @@
-/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-005-Dev/4947D/fe55_raft_acq
-/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-005-Dev/4950D/fe55_raft_acq
-/gpfs/mnt/gpfs01/astro/workarea/ccdtest/test/LCA-11021_RTM/LCA-11021_RTM-005-Dev/4957D/fe55_raft_acq

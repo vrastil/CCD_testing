@@ -3,26 +3,27 @@ import os, sys
 import random
 import numpy as np
 
+from raft_observation import raft_observation
+from exploreRaft import exploreRaft
+
 from . import data_handling as dh
 from . import plot_handling as ph
 from . import file_handling as fh
 
+keys = ['read_noise', 'gain', 'psf_sigma', 'full_well', 'dark_current_95', 'max_frac_dev',
+        'ptc_gain', 'cti_high_parallel', 'cti_high_serial', 'cti_low_parallel', 'cti_low_serial']
 
-def analyze_single_img(img, out_dir, omit_rebs=[]):
+def analyze_single_img(img, title='', out_dir=None, omit_rebs=[]):
     """ Analyze and plot results of single image.
     img:	ImgInfo storing files of one image
     out_dir:	output directory"""
 
-    out_dir += img.out_dir + img.date_str + '/'
-    if not os.path.exists(out_dir):
-        print "Creating outdir '%s'" % out_dir
-        os.makedirs(out_dir)
+    fh.create_dir(out_dir)
 
     read_rebs = set()
     for fli in img:
         read_rebs.add(fli.reb)
 
-    title = img.run + '_' + img.date_str
     bin_num = (45 * img.ccd_num) / 9
     # data
     print "Getting data..."
@@ -49,51 +50,110 @@ def analyze_single_img(img, out_dir, omit_rebs=[]):
     ph.plot_cor_all(corcoef, img, title, out_dir)
     ph.plot_cor_ccd(corcoef, img, title, out_dir)
 
+    vmin = np.percentile(mean, 10)
+    vmax = np.percentile(mean, 90)
+    ph.plot_raft_map(mean, img, title + '_map_mean', out_dir, vmin, vmax)
+    vmin = np.percentile(noise, 10)
+    vmax = np.percentile(noise, 90)
+    ph.plot_raft_map(noise, img, title + '_map_noise', out_dir, vmin, vmax)
+    ph.plot_raft_map(dnoise, img, title + '_map_dnoise_2', out_dir, vmin, vmax)
+    vmin = np.percentile(dnoise, 22.5)
+    vmax = np.percentile(dnoise, 90)
+    ph.plot_raft_map(dnoise, img, title + '_map_dnoise', out_dir, vmin, vmax)
+
     return ph.plot_histogram_all_one_binning(mean, noise, dnoise, title, out_dir,
                                              bin_num, img.ccd_num, omit_rebs, read_rebs)
 
 
-def analyze_run(RUN_DIR, OUT_DIR='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/Noise_studies/', num_img=0, omit_REBs=[]):
+def analyze_run(run, imgtype="BIAS", db='Dev', site='BNL', prodServer='Dev',
+                appSuffix='-jrb', num_img=1, omit_rebs=[],
+                out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/RTM-2_results/'):
     """ Analyze and plot results for the whole run. """
 
-    if not OUT_DIR.endswith('/'):
-        OUT_DIR += '/'
-    if not RUN_DIR.endswith('/'):
-        RUN_DIR += '/'
+    print '*******************'
+    print 'Analyzing run %s' % run
+    print '*******************'
+    if not out_dir.endswith('/'):
+        out_dir += '/'
+    out_dir += run + '/'
 
-    print 'Loading images...'
-    run = fh.RunInfo(RUN_DIR)
-    run.add_all_img()
-    print 'Loaded %i images (for %i run(s)) totaling %i files.' % (
-        run.img_num_all, run.run_num, run.fl_num)
+    step = 'fe55_raft_acq'
+    print 'Step: %s\nLoading images...' % step
 
-    for key, imgs in run.runs.iteritems():
-        print 'Analyzing run %s' % imgs[0].out_dir
-        num_img_ = num_img
-        if num_img_ == 0 or num_img_ > run.img_num[key]:
-            num_img_ = run.img_num[key]
+    rO = raft_observation(run=run, step=step, imgtype=imgtype, db=db,
+                          site=site, prodServer=prodServer, appSuffix=appSuffix)
+    obs_dict = rO.find()
+    eR = exploreRaft(db=db, prodServer=prodServer, appSuffix=appSuffix)
+    ccd_list = eR.raftContents(rO.raft)
 
-        img_proc = random.sample(xrange(run.img_num[key]), num_img_)
-        img_proc.sort()  # process random images
+    print 'Loaded %i images totaling %i files.' % (
+        len(obs_dict), sum(len(x) for x in obs_dict.values()))
 
-        hist_summary = ""
-        for j, i in enumerate(img_proc):
-            img = imgs[i]
-            hist_summary += str(img[0].date.time())
-            print "Analyzing image %i (%i/%i)..." % (i, j + 1, num_img_)
-            hist_summary += analyze_single_img(img, OUT_DIR, omit_REBs)
+    num_img_ = num_img
+    if num_img_ == 0 or num_img_ > len(obs_dict):
+        num_img_ = len(obs_dict)
 
-        print "All images from run processed!\nCreating summary file and plot..."
-        f_hist_file = OUT_DIR + key + 'hist_summary.dat'
-        f_hist = open(f_hist_file, 'w')
-        f_hist.write(hist_summary)
-        f_hist.close()
-        ph.plot_one_run_summary(f_hist_file, OUT_DIR + key)
+    hist_summary = ""
+    i = 1
+
+    title = '%s_%s' % (run, imgtype)
+
+    for date, fl_ls in obs_dict.iteritems():
+        hist_summary += date
+        title_ = title + '_%s' % date
+        img = fh.ImgInfo(fl_ls, ccd_list, run=run, img_type=imgtype, date=date)
+        out_dir_ = out_dir + date + '/'
+        print "Analyzing image %i/%i..." % (i, num_img_)
+        hist_summary += analyze_single_img(img, title=title_, out_dir=out_dir_, omit_rebs=omit_rebs)
+        i += 1
+        if i > num_img_:
+            break
+
+    print "All images from run processed!\nCreating summary file and plot..."
+    f_hist_file = out_dir + 'hist_summary.dat'
+    f_hist = open(f_hist_file, 'w')
+    f_hist.write(hist_summary)
+    f_hist.close()
+    ph.plot_one_run_summary(f_hist_file, out_dir)
+
+    step = 'collect_raft_results'
+    print 'Step: %s\nLoading images...' % step
+
+    try:
+        rO = raft_observation(run=run, step=step, db=db, site=site,
+                              prodServer=prodServer, appSuffix=appSuffix)
+        obs_dict = rO.find()
+    except:
+        print "No files generated by run '%s' in step '%s'" % (run, step)
+        step = 'fe55_raft_analysis'
+        print '\nStep: %s\nLoading images...' % step
+        try:
+            rO = raft_observation(run=run, step=step, db=db, site=site,
+                                  prodServer=prodServer, appSuffix=appSuffix)
+            obs_dict = rO.find()
+        except:
+            print "No files generated by run '%s' in step '%s'" % (run, step)
+            return None
+
+    results = set()
+    for val in obs_dict.itervalues():
+        for a_file in val:
+            if 'eotest_results' in a_file:
+                results.add(a_file)
+    print 'Loaded %i files.' % len(results)
+    img = fh.ImgInfo(list(results), ccd_list, run=run, img_type=imgtype)
+    title = '%s_%s' % (run, imgtype)
+    for key in keys:
+        data = dh.load_data(img, key)
+        if data is not None:
+            vmin = np.percentile(data, 10)
+            vmax = np.percentile(data, 90)
+            ph.plot_raft_map(data, img, title + '_map_' + key, out_dir, vmin, vmax)
 
     print "Everything done!"
 
 
-def compare_runs(OUT_DIR='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/Noise_studies/'):
+def compare_runs(OUT_DIR='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/Results/'):
     """ Average data in 'hist_summary.dat' files, and plot for all available runs. """
 
     x_run = []
@@ -127,69 +187,7 @@ def compare_runs(OUT_DIR='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/N
     print "Everything done!"
 
 
-def get_raft_maps(run_dir, keys, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/Raft_maps/', values=None):
-    """ load data and plots results (raft maps) from run_dir, try to load all data with names in list of keys,
-    and if dictionary of min and max values is present, use them for plotting
+if __name__ == "__main__":
+    run = '4963D'
+    analyze_run(run)
 
-     keys:   list of keys
-     values: dictionary { key : (vmin, vmax) }
-     """
-    if values is None:
-        values = {}
-
-    if not run_dir.endswith('/'):
-        run_dir += '/'
-
-    if not out_dir.endswith('/'):
-        out_dir += '/'
-
-    print 'Loading files...'
-    all_files_info = []
-    for a_file, subdir in fh.get_files_in_traverse_dir(run_dir, '*eotest_results.fits'):
-        try:
-            subdir = subdir.split('/')
-            subdir = subdir[0] + '/' + subdir[1] +'/' #only v and vnum
-        except:
-            subdir = ''
-        all_files_info.append(fh.FileInfo(a_file, subdir))
-
-    img_v = {}
-    for file_info in all_files_info:
-        if file_info.subdir not in img_v:
-            img_v[file_info.subdir] = fh.ImgInfo()
-        img_v[file_info.subdir].add_img(file_info)
-    print 'Loaded %i files.' % len(all_files_info)
-
-    for img in img_v.itervalues():
-        out_dir_ = out_dir + str(img.run) + '/' + img.subdir
-        if not os.path.exists(out_dir_):
-            print "Creating outdir '%s'" % out_dir_
-            os.makedirs(out_dir_)
-
-        print "Plotting..."
-        for key in keys:
-            data = dh.load_data(img, key)
-            if data is not None:
-                if key in values:
-                    vmin, vmax = values[key]
-                else:
-                    vmin = np.percentile(data, 10)
-                    vmax = np.percentile(data, 90)
-                ph.plot_raft_map(data, img, key, out_dir_, vmin, vmax)
-
-    print "Everything done!"
-
-
-def load_npy(info_txt):
-    """  """
-    with open(info_txt, 'r') as f:
-        content = f.readlines()
-    lines = []
-    for x in content:
-        if x.startswith('\t'): lines.append(x)
-    lines = [''.join(x.split()) for x in lines]
-    fli = [fh.FileInfo(f, '') for f in lines]
-
-    img = fh.ImgInfo()
-    for fl in fli:
-        img.add_img(fl)

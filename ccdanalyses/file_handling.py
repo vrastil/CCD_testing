@@ -1,26 +1,12 @@
-import datetime
-import glob
-import fnmatch
-import os
+import os, fnmatch
 from astropy.io import fits
 
-# global variables for deciphering devices : _DEV, _DEV_INDEX, _DEV_INDEX_TR
-
-_DEV = {
-    'ITL-3800C-145-Dev' : '00', 'ITL-3800C-022-Dev' : '01', 'ITL-3800C-041-Dev' : '02',
-    'ITL-3800C-100-Dev' : '10', 'ITL-3800C-017-Dev' : '11', 'ITL-3800C-018-Dev' : '12',
-    'ITL-3800C-102-Dev' : '20', 'ITL-3800C-146-Dev' : '21', 'ITL-3800C-103-Dev' : '22',
-    'ITL-3800C-078-Dev' : '00', 'ITL-3800C-034-Dev' : '01', 'ITL-3800C-068-Dev' : '02',
-    'ITL-3800C-072-Dev' : '10', 'ITL-3800C-061-Dev' : '11', 'ITL-3800C-085-Dev' : '12',
-    'ITL-3800C-062-Dev' : '20', 'ITL-3800C-050-Dev' : '21', 'ITL-3800C-079-Dev' : '22',
-    'E2V-CCD250-220-Dev' : '00', 'E2V-CCD250-239-Dev' : '01', 'E2V-CCD250-154-Dev' : '02',
-    'E2V-CCD250-165-Dev' : '10', 'E2V-CCD250-130-Dev' : '11', 'E2V-CCD250-153-Dev' : '12',
-    'E2V-CCD250-163-Dev' : '20', 'E2V-CCD250-216-Dev' : '21', 'E2V-CCD250-252-Dev' : '22'
-}
-
-_DEV_INDEX = ['22', '12', '02', '21', '11', '01', '20', '10', '00']
-_DEV_INDEX_TR = ['22', '21', '20', '12', '11', '10', '02', '01', '00']
-
+def load_runs(a_file):
+    """ from a file containing analysis directories return their paths in a list """
+    o_file = open(a_file, 'r')
+    tmp = o_file.read().splitlines()
+    o_file.close()
+    return tmp
 
 def get_files_in_traverse_dir(a_dir, a_file):
     """ return list of all files in directory and its subdirectories \
@@ -35,80 +21,27 @@ def get_files_in_traverse_dir(a_dir, a_file):
                 ls_file.append((os.path.join(root, name), subdir))
     return ls_file
 
+def create_dir(out_dir):
+    if not os.path.exists(out_dir):
+        print "Creating outdir '%s'" % out_dir
+        os.makedirs(out_dir)
 
-def get_immediate_subdirectories(a_dir):
-    """ return list of immediate subdirectories """
-    return [name for name in os.listdir(a_dir)
-            if os.path.isdir(os.path.join(a_dir, name))]
-
-
-def load_runs(a_file):
-    """ from a file containing analysis directories return their paths in a list """
-    o_file = open(a_file, 'r')
-    tmp = o_file.read().splitlines()
-    o_file.close()
-    return tmp
-
+_DEV_INDEX = ['S22', 'S12', 'S02', 'S21', 'S11', 'S01', 'S20', 'S10', 'S00']
+_DEV_INDEX_TR = ['S22', 'S21', 'S20', 'S12', 'S11', 'S10', 'S02', 'S01', 'S00']
 
 class FileInfo(object):
     """ Stores information about file and decipher file name:
     device, image number, time of image, etc """
 
-    dev_name = ""
-
-    def load_file(self, a_file):
-        """ read .fits file and extract useful information """
-
-        if not os.path.isfile(a_file):
-            print "No such file '%s'." % a_file
-            return
-
-        fits_file = fits.open(a_file)
-        header = fits_file[0].header
-
-        self.file = a_file
-
-        if 'RUNNUM' in header:
-            self.run = header['RUNNUM']
-        else:
-            self.run = 'UNKNOWN_RUN'
-
-        if 'LSST_NUM' in header:
-            self.dev_key = (header['LSST_NUM'])
-        else:
-            print 'ERROR! Wrong format of header, file "%s"' % self.file
-
-        if 'TESTTYPE' in header:
-            self.test_type = header['TESTTYPE']
-        else:
-            self.test_type = 'UNKNOWN'
-
-        if 'IMGTYPE' in header:
-            self.img_type = header['IMGTYPE']
-        else:
-            self.img_type = 'UNKNOWN'
-
-        if 'DATE-OBS' in header:
-            self.date = datetime.datetime.strptime(
-                header['DATE-OBS'], '%Y-%m-%dT%H:%M:%S.%f')
-            self.date_str = self.date.strftime('%Y%m%d_%H%M%S')
-        elif 'DATE' in header:
-            self.date = datetime.datetime.strptime(
-                header['DATE'], '%Y-%m-%dT%H:%M:%S.%f')
-            self.date_str = self.date.strftime('%Y%m%d_%H%M%S')
-        else:
-            print 'ERROR! Wrong format of header, file "%s"' % self.file
-
-        fits_file.close()
-
-    def set_name(self):
+    def set_name(self, ccd_list):
         """ convert CCD number into its 2D position in REB """
-        if self.dev_key in _DEV:
-            self.dev_name = _DEV[self.dev_key]
-        elif self.dev_key + '-Dev' in _DEV:
-            self.dev_name = _DEV[self.dev_key + '-Dev']
-        else:
-            print 'ERROR! Unknown dev_key "%s", file "%s"' % (self.dev_key, self.file)
+        self.dev_name = ''
+        for ccd in ccd_list:
+            if ccd[0] in self.file:
+                self.dev_name = ccd[1]
+                break
+        if self.dev_name == '':
+            print 'ERROR! Unknown structure of file name "%s"' % (self.file)
 
     def set_index(self):
         """ set index of CCD for sorting purposes """
@@ -120,13 +53,12 @@ class FileInfo(object):
 
     def set_reb(self):
         """ set REB number """
-        reb = self.dev_name[0:1]
+        reb = self.dev_name[1:2]
         self.reb = int(reb)
 
-    def __init__(self, a_file, a_subdir):
-        self.load_file(a_file)
-        self.subdir = a_subdir
-        self.set_name()
+    def __init__(self, a_file, ccd_list):
+        self.file = a_file
+        self.set_name(ccd_list)
         self.set_index()
         self.set_index_tr()
         self.set_reb()
@@ -135,197 +67,86 @@ class FileInfo(object):
         return "FileInfo('%s')" % self.file
 
     def __str__(self):
-        str_info = (
-            "file = '%s'\ndev_key = %s\ndev_name = %s\n"
-            "img_type = %s\ntest_type = %s\nrun = %s\ndate = %s" % (
-                self.file, self.dev_key, self.dev_name,
-                self.img_type, self.test_type, self.run, self.date
+        str_info = "file = '%s'\ndev_name = %s" % (
+            self.file, self.dev_name
             )
-        )
         return str_info
 
 
 class ImgInfo(object):
     """ Class containg information about one image for whole raft,
-    i.e. number of CCDs, test and image type, etc."""
+    i.e. number of CCDs and files locations."""
 
-    def __init__(self):
-        self.img = []
-        self.run = ''
-        self.test_type = ''
-        self.img_type = ''
-        self.test_id = ''
-        self.date = ''
-        self.date_str = ''
-        self.ccd_num = 0
-        self.subdir = ''
-        self.out_dir = ''
+    def __init__(self, fl_ls, ccd_list, run='', img_type='', date=''):
+        self.run = run
+        self.img_type = img_type
+        self.date = date
+        self.files = []
+        for a_file in fl_ls:
+            self.files.append(FileInfo(a_file, ccd_list))
+        self.ccd_num = len(self.files)
+        self.sort()
 
     def __getitem__(self, i):
-        return self.img[i]
+        return self.files[i]
 
     def __iter__(self):
-        for img in self.img:
-            yield img
+        for a_file in self.files:
+            yield a_file
 
     def __repr__(self):
-        return "ImgInfo(%s, %s, %s, %s)" % (self.run, self.img_type, self.test_type, self.date)
+        return "ImgInfo(%s, %s, %s)" % (self.run, self.img_type, self.date)
 
     def __str__(self):
         str_info = (
-            "ImgInfo():\nrun = %s\nimg_type = %s\ntest_type = %s\ndate = %s\nccd_num = %s\n" % (
-                self.run, self.img_type, self.test_type, self.date, self.ccd_num
+            "ImgInfo():\nrun = %s\nimg_type = %s\ndate = %s\nccd_num = %s\n" % (
+                self.run, self.img_type, self.date, self.ccd_num
             )
         )
         return str_info
 
     def info(self):
         """ return string, info about the image """
-        str_info = self.__repr__() + '\nCCDs order= '
-        fl_info = ''
+        str_info = 'run=%s\nimg_type=%s\ndate=%s\nfiles=\n' % (
+            self.run, self.img_type, self.date)
         for fli in self:
-            str_info += "'%s' " % fli.dev_name
-            fl_info += '\t' + fli.file + '\n'
-
-        return str_info + '\nFiles=\n' + fl_info
-
-    def make_check(self, img):
-        """ make check that all images have the same properties """
-        check = True
-        check *= (img.run == self.run and img.test_type == self.test_type and
-                  img.img_type == self.img_type and img.subdir == self.subdir)
-        return check
-
-    def make_check_w_time(self, img):
-        """ make check that all images have the same properties """
-        check = True
-        check *= (img.run == self.run and img.test_type == self.test_type and
-                  img.img_type == self.img_type and img.subdir == self.subdir
-                  and img.date == self.date)
-        return check
-
-    def add_img(self, a_file_info):
-        """ load one .fits file """
-        self.img.append(a_file_info)
-        if self.ccd_num == 0:
-            self.run = self.img[0].run
-            self.test_type = self.img[0].test_type
-            self.img_type = self.img[0].img_type
-            self.date = self.img[0].date
-            self.date_str = self.img[0].date_str
-            self.subdir = self.img[0].subdir
-            self.ccd_num += 1
-            self.out_dir = '%s/%s_%s/%s' % (self.run, self.test_type, self.img_type, self.subdir)
-        else:
-            if self.make_check(self.img[self.ccd_num]):
-                self.ccd_num += 1
-                return True
-            else:
-   #             self.img.pop()
-                print "WARNING! Incompatible images in class <ImgInfo>:\n%s\n\nand\n\n%s" % (
-                    self.img.pop(), self.__str__()
-                )
-                return False
+            str_info += "%s=%s\n" % (fli.dev_name, fli.file)
+        return str_info
 
     def sort(self):
         """ sort CCDs: '00', '01',...,'22' """
-        self.img.sort(key=lambda x: x.dev_index_tr, reverse=True)
+        self.files.sort(key=lambda x: x.dev_index_tr, reverse=True)
 
 
-class RunInfo(object):
-    """ Class containing all information about directory structure,
-    where to find individual run CCD folders, load and store file names."""
+def load_info(info_txt):
+    """ Read 'img_info.txt' and return ImgInfo(object).  """
+    with open(info_txt, 'r') as f:
+        content = f.readlines()
+    run = ''; img_type = ''; date = ''; fl_ls = []; ccd_list = []
 
-    def __init__(self, run_dir):
-        self.run_dir = run_dir
-        self.img_num_all = 0
-        self.img_num = {}
-        self.run_num = 0
-        self.fl_num = 0
-        self.img = {}
-        self.runs = {}
+    for x in content:
+        if x.startswith('run='):
+            run = x.replace('run=', '').rstrip()
+        if x.startswith('img_type='):
+            img_type = x.replace('img_type=', '').rstrip()
+        if x.startswith('date='):
+            date = x.replace('date=', '').rstrip()
+        if x.startswith('S'):
+            a_file = x[4:].rstrip()
+            fl_ls.append(a_file)
+            ccd_list.append((a_file, x[0:3]))
 
-    def add_all_img(self):
-        """ load all available images, i.e. all .fits files in run_dir """
-        os.chdir(self.run_dir)
-        all_files_info = []
-        for a_file, subdir in get_files_in_traverse_dir(self.run_dir, '*.fits'):
-            try:
-                subdir = subdir.split('/')
-                subdir = subdir[0] + '/' + subdir[1] +'/' #only v and vnum
-            except:
-                subdir = ''
-            all_files_info.append(FileInfo(a_file, subdir))
+    img = ImgInfo(fl_ls, ccd_list, run=run, img_type=img_type, date=date)
+    return img
 
-        for file_info in all_files_info:
-            if file_info.date not in self.img:
-                self.img[file_info.date] = ImgInfo()
-            self.img[file_info.date].add_img(file_info)
-
-        for img in self:
-            img.sort()
-
-        for imgi in self.img.itervalues():
-            if imgi.out_dir not in self.runs:
-                self.runs[imgi.out_dir] = []
-                self.img_num[imgi.out_dir] = 0
-            self.runs[imgi.out_dir].append(imgi)
-            self.img_num[imgi.out_dir] += 1
-
-        self.img_num_all = len(self.img)
-        self.fl_num = len(all_files_info)
-        self.run_num = len(self.runs)
-
-    def __getitem__(self, i):
-        return self.img.values()[i]
-
-    def __iter__(self):
-        for img in self.img.values():
-            yield img
-
-    def __repr__(self):
-        return "Run_info('%s')" % (self.run_dir)
-
-    def __str__(self):
-        str_repr = "Run_info('%s'):\n" % (self.run_dir)
-        for key, run in self.runs.iteritems():
-            str_repr += "run = %s, test_type = %s, img_type = %s, images = %i\n" % (
-                run[0].run, run[0].test_type, run[0].img_type, self.img_num[key]
-                )
-        return str_repr
-
-
-class GainInfo(object):
-    """ Class containg information about eotest fits file for the whole run"""
-
-    def __init__(self):
-        self.gain = []
-        self.gain_err = []
-        self.len = 0
-
-    def __getitem__(self, i):
-        return self.gain[i], self.gain_err[i]
-
-    def __iter__(self):
-        for g, gerr in self.gain, self.gain_err:
-            yield g, gerr
-
-    def __repr__(self):
-        return "GainInfo()"
-
-    def __str__(self):
-        return "GainInfo():\n%s" % self.gain
-
-    def add_gain(self, a_dir):
-        """ load all '*eotest*fits' file in dirs[] """
-
-        fl = get_files_in_traverse_dir(a_dir, '*eotest*fits')
-
-        for f in fl:
-            fits_file = fits.open(f[0])
-            header = fits_file[0].header
-            self.gain.append(fits_file[1].data['gain'])
-            self.gain_err.append(fits_file[1].data['gain_error'])
-            fits_file.close()
-
-        self.len = len(fl)
+def load_imgs(runs, in_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/RTM-2_results/'):
+    """ from list of run numbers load ImgInfo """
+    files_i = []
+    imgs = []
+    a_file = 'img_info.txt'
+    for run in runs:
+        a_dir = in_dir + run
+        files_i.append(get_files_in_traverse_dir(a_dir, a_file)[0][0])
+    for a_file in files_i:
+        imgs.append(load_info(a_file))
+    return imgs

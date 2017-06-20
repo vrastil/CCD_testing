@@ -2,7 +2,11 @@
 import numpy as np
 from astropy.io import fits
 
+from . import file_handling as fh
 from . import misc
+
+from raft_observation import raft_observation
+from exploreRaft import exploreRaft
 
 def slice_sort_seg(o_fits_file):
     """ take only segment data ([1:17]) and sort them"""
@@ -82,3 +86,72 @@ def load_data(img, data_key):
         return data
     else:
         return None
+
+def load_noises_e(runs):
+    """ for list of runs return list of noises in e- """
+    imgtype = "BIAS"; db = 'Dev'; site = 'BNL'; prodServer = 'Dev'; appSuffix = '-jrb'
+    step = 'fe55_raft_analysis'
+    noises_e = []
+
+    for run in runs:
+        print "Loading data for run '%s'..." % run
+        rO = raft_observation(run=run, step=step, db=db, site=site,
+                              prodServer=prodServer, appSuffix=appSuffix)
+        obs_dict = rO.find()
+        eR = exploreRaft(db=db, prodServer=prodServer, appSuffix=appSuffix)
+        ccd_list = eR.raftContents(rO.raft)
+
+        results = set()
+        for val in obs_dict.itervalues():
+            for a_file in val:
+                if 'eotest_results' in a_file:
+                    results.add(a_file)
+
+        img = fh.ImgInfo(list(results), ccd_list, run=run, img_type=imgtype)
+        gain = load_data(img, 'gain')
+        if gain is not None:
+            print 'gain: True'
+        else:
+            print 'gain: False'
+            return None
+
+        a_dir = '/gpfs/mnt/gpfs01/astro/www/vrastil/TS8_Data_Analysis/RTM-2_results/' + run
+        a_file = 'noise.npy'
+        noise = fh.get_files_in_traverse_dir(a_dir, a_file)[0][0]
+        noise = np.load(noise)
+        if noise is not None:
+            print 'noise: True'
+        else:
+            print 'noise: False'
+            return None
+        noises_e.append(noise*gain)
+    return noises_e
+
+def make_tab_corcoef_voltage(data_l):
+    data = np.array(data_l)
+    x, y, z = data.shape; l = y*z
+    data = data.reshape(x, l)
+    a = np.array([np.corrcoef(data[:, i], data[:, j])
+                  for i in range(l) for j in range(l)])
+    aa = np.array([a[i, 0, 1] for i in range(l * l)])
+    aa.shape = ((l, l))
+    return aa
+
+def make_tab_corcoef_voltage_mean(data_l):
+    data = np.array(data_l)
+    x, y, z = data.shape
+    mean = []
+    for i in range(x):
+        mean_ = []
+        for j in range(y):
+            mean_.append(np.mean(data[i, j]))
+        mean.append(mean_)
+    mean = np.array(mean)
+
+    a = np.array([np.corrcoef(mean[:, i], mean[:, j])
+                  for i in range(y) for j in range(y)])
+
+    aa = np.array([a[i, 0, 1] for i in range(y * y)])
+    aa.shape = ((y, y))
+    return aa
+
