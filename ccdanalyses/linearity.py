@@ -1,8 +1,8 @@
 
 import numpy as np
 from astropy.io import fits
-matplotlib.use('Agg')
 import matplotlib
+matplotlib.use('Agg')
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
