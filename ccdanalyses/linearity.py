@@ -67,12 +67,15 @@ def plot_current_exposure_mlt(fig_files, out_dir, show=False, save=True, ret=Fal
     else: plt.close(fig)
 
 def pdf_current_exposure_mlt(in_dir, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity'):
+    print 'Loading files...'
     files = sorted([f[0] for f in get_files_in_traverse_dir(in_dir, 'pd-values*.txt')])
     pp = PdfPages(out_dir + 'current_exposure.pdf')
-    for fig_files in chunks(files, 24):
+    for i, fig_files in enumerate(chunks(files, 24)):
+        print 'Printing page %i...' % (i+1)
         a_plot = plot_current_exposure_mlt(fig_files, out_dir, save=False, ret=True)
         pp.savefig(a_plot)
     pp.close()
+    print 'Everything done!'
 
 def gaussian(x, a, mean, sigma):
     return a * np.exp(-((x - mean)**2 / (2 * sigma**2)))
@@ -214,13 +217,18 @@ def plot_current_exposure_detail_mlt(fig_files, out_dir, cur_val_list=None, show
     else: plt.close(fig); return cur_val_list
 
 def pdf_current_exposure_detail_mlt(in_dir, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/'):
+    print 'Loading files...'
     files = sorted([f[0] for f in get_files_in_traverse_dir(in_dir, 'pd-values*.txt')])
     pp = PdfPages(out_dir + 'current_exposure_detail.pdf')
     cur_val_list = None
-    for fig_files in chunks(files, 6):
+    for i, fig_files in enumerate(chunks(files, 6)):
+        print 'Printing page %i...' % (i+1)
         a_plot, cur_val_list = plot_current_exposure_detail_mlt(fig_files, out_dir, cur_val_list, save=False, ret=True)
         pp.savefig(a_plot)
         plt.close(a_plot)
     pp.close()
+    print "Writing data to 'data.json'"
     with open(out_dir + 'data.json', 'w') as outfile:
         json.dump(cur_val_list, outfile, indent=2)
+    print 'Everything done!'
+
