@@ -12,7 +12,7 @@ from scipy.stats import norm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import json
 
-from .file_handling import  
+from .file_handling import  get_files_in_traverse_dir
 
 def chunks(a_list, n):
     """Yield successive n-sized chunks from l."""
