@@ -1,4 +1,4 @@
-
+import json
 import numpy as np
 from astropy.io import fits
 import matplotlib
@@ -10,7 +10,6 @@ import scipy
 from scipy import optimize
 from scipy.stats import norm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-import json
 
 from .file_handling import  get_files_in_traverse_dir
 
@@ -18,15 +17,6 @@ def chunks(a_list, n):
     """Yield successive n-sized chunks from l."""
     for i in range(0, len(a_list), n):
         yield a_list[i:i + n]
-
-def get_gains(a_dir):
-    files = [f[0] for f in get_files_in_traverse_dir(
-        a_dir + 'fe55_analysis/', '*eotest*')]
-
-    if len(files) != 1:
-        print "WARNING! Multiple eotest files, taking the first file '%s'." % files[0]
-    return fits.getdata(files[0])['GAIN']
-
 
 def current_exposure(data, ax, title='', show_labels=True):
     plt.rc('xtick', labelsize=10)
