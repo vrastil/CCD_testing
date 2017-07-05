@@ -101,7 +101,7 @@ def current_exposure_detail(data_all, gs, title='', show_labels=True):
     data = data[np.where(data[:, 1] < -10**-12 * ylim_1[0])]
     y = -10**12 * data[:, 1]
     n, bins, patches = ax3.hist(
-        y, bins='auto', facecolor='red', orientation="horizontal", edgecolor='black')
+        y, bins='sturges', facecolor='red', orientation="horizontal", edgecolor='black')
     x = [0.5 * (bins[i] + bins[i + 1]) for i in xrange(len(bins) - 1)]
     p0 = [np.max(n), np.mean(y), np.std(y)]
     try:
@@ -139,7 +139,7 @@ def current_exposure_detail(data_all, gs, title='', show_labels=True):
     data = data[np.where(data[:, 1] > -10**-12 * ylim_2[1])]
     y = -10**12 * data[:, 1]
     n, bins, patches = ax4.hist(
-        y, bins='auto', facecolor='blue', orientation="horizontal", edgecolor='black')
+        y, bins='sturges', facecolor='blue', orientation="horizontal", edgecolor='black')
     x = [0.5 * (bins[i] + bins[i + 1]) for i in xrange(len(bins) - 1)]
     p0 = [np.max(n), np.mean(y), np.std(y)]
     try:
