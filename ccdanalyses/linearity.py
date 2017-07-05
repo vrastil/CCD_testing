@@ -67,7 +67,7 @@ def plot_current_exposure_mlt(fig_files, out_dir, show=False, save=True, ret=Fal
     if ret: return fig
     else: plt.close(fig)
 
-def pdf_current_exposure_mlt(in_dir, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity'):
+def pdf_current_exposure_mlt(in_dir, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/'):
     print 'Loading files...'
     files = sorted([f[0] for f in get_files_in_traverse_dir(in_dir, 'pd-values*.txt')])
     pp = PdfPages(out_dir + 'current_exposure.pdf')
