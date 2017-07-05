@@ -9,6 +9,7 @@ import scipy
 from scipy import optimize
 from scipy.stats import norm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import json
 
 from .file_handling import get_files_in_traverse_dir
 
@@ -103,23 +104,24 @@ def current_exposure_detail(data_all, gs, title='', show_labels=True):
         popt, pcov = optimize.curve_fit(gaussian, x, n, p0=p0)
     except RuntimeError:
         print "RuntimeError: Optimal parameters not found"
-        textstr1 = r'$\mu=?$ pA''\n'r'$\sigma=?$ pA'
+        textstr1 = 'Gaussian:\n'r'$\mu=?$ pA''\n'r'$\sigma=?$ pA'
     else:
         cur_val["mu_high_hist"] = popt[1]
         cur_val["sigma_high_hist"] = popt[2]
-        textstr1 = r'$\mu=%.0f$ pA''\n'r'$\sigma=%.0f$ pA'% (popt[1], popt[2])
+        textstr1 = 'Gaussian:\n'r'$\mu=%.0f$ pA''\n'r'$\sigma=%.0f$ pA'% (popt[1], popt[2])
         x = np.linspace(ylim_1[0], ylim_1[1], 100)
         gauss = gaussian(x, *popt)
         ax3.plot(gauss, x, 'b--', linewidth=2)
 
+    ax3.barh(np.mean(y), np.max(n), 2*np.std(y), color="green", alpha=0.4, edgecolor='black')
     cur_val["mu_high"] = np.mean(y)
     cur_val["sigma_high"] = np.std(y)
-    textstr2 = r'$\mu=%.0f$ pA''\n'r'$\sigma=%.0f$ pA'% (np.mean(y), np.std(y))
+    textstr2 = 'Raw:\n'r'$\mu=%.0f$ pA''\n'r'$\sigma=%.0f$ pA'% (np.mean(y), np.std(y))
     props1 = dict(boxstyle='round', facecolor='red', alpha=0.4)
     props2 = dict(boxstyle='round', facecolor='green', alpha=0.4)
-    ax3.text(0.67, 0.26, textstr1, transform=ax3.transAxes, fontsize=15,
+    ax3.text(0.67, 0.35, textstr1, transform=ax3.transAxes, fontsize=15,
              verticalalignment='top', bbox=props1)
-    ax3.text(0.67, 0.12, textstr2, transform=ax3.transAxes, fontsize=15,
+    ax3.text(0.67, 0.17, textstr2, transform=ax3.transAxes, fontsize=15,
              verticalalignment='top', bbox=props2)
     ax3.set_ylim(ylim_1)
     ax3.yaxis.tick_right()
@@ -144,7 +146,7 @@ def current_exposure_detail(data_all, gs, title='', show_labels=True):
     else:
         cur_val["mu_low"] = popt[1]
         cur_val["sigma_low"] = popt[2]
-        textstr3 = r'$\mu=%.2f$ pA''\n'r'$\sigma=%.2f$ pA' % (popt[1], popt[2])
+        textstr3 = 'Gaussian:\n'r'$\mu=%.2f$ pA''\n'r'$\sigma=%.2f$ pA' % (popt[1], popt[2])
         x = np.linspace(ylim_2[0], ylim_2[1], 100)
         gauss = gaussian(x, *popt)
         ax4.plot(gauss, x, 'r--', linewidth=2)
@@ -211,7 +213,7 @@ def plot_current_exposure_detail_mlt(fig_files, out_dir, cur_val_list=None, show
     if ret: return fig, cur_val_list
     else: plt.close(fig); return cur_val_list
 
-def pdf_current_exposure_detail_mlt(in_dir, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity'):
+def pdf_current_exposure_detail_mlt(in_dir, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/'):
     files = sorted([f[0] for f in get_files_in_traverse_dir(in_dir, 'pd-values*.txt')])
     pp = PdfPages(out_dir + 'current_exposure_detail.pdf')
     cur_val_list = None
@@ -220,4 +222,5 @@ def pdf_current_exposure_detail_mlt(in_dir, out_dir='/gpfs/mnt/gpfs01/astro/www/
         pp.savefig(a_plot)
         plt.close(a_plot)
     pp.close()
-    return cur_val_list
+    with open(out_dir + 'data.json', 'w') as outfile:
+        json.dump(cur_val_list, outfile, indent=2)
