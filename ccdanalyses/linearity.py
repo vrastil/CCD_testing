@@ -61,7 +61,7 @@ def plot_current_exposure_mlt(fig_files, out_dir, show=False, save=True, ret=Fal
         current_exposure(data, ax, title=title, show_labels=False)
         
     plt.subplots_adjust(hspace=0.2, wspace=0.15)
-    fig.suptitle('Current [pA] vs time [s]', y=1.035-0.022*row, size=28)
+    fig.suptitle('Current [pA] vs time [s]', y=1.04-0.02*row, size=28)
     if save: plt.savefig(out_dir + 'current_exposure.png')
     if show: plt.show()
     if ret: return fig
@@ -101,7 +101,7 @@ def current_exposure_detail(data_all, gs, title='', show_labels=True):
     data = data[np.where(data[:, 1] < -10**-12 * ylim_1[0])]
     y = -10**12 * data[:, 1]
     n, bins, patches = ax3.hist(
-        y, bins='sturges', facecolor='red', orientation="horizontal", edgecolor='black')
+        y, bins='auto', facecolor='red', orientation="horizontal", edgecolor='black')
     x = [0.5 * (bins[i] + bins[i + 1]) for i in xrange(len(bins) - 1)]
     p0 = [np.max(n), np.mean(y), np.std(y)]
     try:
@@ -139,7 +139,7 @@ def current_exposure_detail(data_all, gs, title='', show_labels=True):
     data = data[np.where(data[:, 1] > -10**-12 * ylim_2[1])]
     y = -10**12 * data[:, 1]
     n, bins, patches = ax4.hist(
-        y, bins='sturges', facecolor='blue', orientation="horizontal", edgecolor='black')
+        y, bins='auto', facecolor='blue', orientation="horizontal", edgecolor='black')
     x = [0.5 * (bins[i] + bins[i + 1]) for i in xrange(len(bins) - 1)]
     p0 = [np.max(n), np.mean(y), np.std(y)]
     try:
