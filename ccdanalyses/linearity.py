@@ -1,6 +1,7 @@
 
 import numpy as np
 from astropy.io import fits
+matplotlib.use('Agg')
 import matplotlib
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
@@ -11,7 +12,7 @@ from scipy.stats import norm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import json
 
-from .file_handling import get_files_in_traverse_dir
+from .file_handling import  
 
 def chunks(a_list, n):
     """Yield successive n-sized chunks from l."""
