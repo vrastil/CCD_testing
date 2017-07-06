@@ -60,3 +60,25 @@ def get_e(a_dir, out_dir=''):
             json.dump(data_l, outfile, indent=2)
 
     return data_l
+
+def plot_one_seg(ax, x, y, xlabel, ylabel):
+    plt.rc('xtick', labelsize=10)
+    plt.rc('ytick', labelsize=10)
+
+def plot_all(in_dir):
+    """ 'in_dir' must contain json files:
+    sig_e.json : for each files  16 segments with signal in electrons
+    cur_exptime.json : for each file (exposure 'flat1' or 'flat2') measured currents """
+
+    with open(in_dir + 'sig_e.json') as data_file:
+        data_sig = json.loads(data_file.read())
+    with open(in_dir + 'cur_exptime.json') as data_file:
+        data_cur_exp = json.loads(data_file.read())
+    
+    # signal vs time
+
+
+    # signal vs time*current [fits]
+
+
+    # signal vs time*current [hist]
