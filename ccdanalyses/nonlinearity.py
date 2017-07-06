@@ -51,6 +51,7 @@ def get_e(a_dir, out_dir=''):
     data_l = []
     for count in counts:
         sig_e = gains*count["AVERAGE"]
+        sig_e = sig_e.tolist()
         data_l.append({"file" : count["file"], "signal_e" : sig_e})
 
     if out_dir != '':
