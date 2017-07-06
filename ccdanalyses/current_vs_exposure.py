@@ -24,7 +24,7 @@ def load_exposure_current(a_dir):
     print ''
     return data
 
-def load_all_currents(a_dir, a_json_file, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/'):
+def load_all_currents(a_dir, a_json_file, out_dir=''):
     print 'Loading fits files:'
     data_fits = load_exposure_current(a_dir)
     print 'Loading json file...'
@@ -63,7 +63,7 @@ def load_all_currents(a_dir, a_json_file, out_dir='/gpfs/mnt/gpfs01/astro/www/vr
     if out_dir != '':
         create_dir(out_dir)
         print "Writing data to 'cur_exptime.json'"
-        with open(out_dir + 'data.json', 'w') as outfile:
-            json.dump(cur_val_list, outfile, indent=2)
+        with open(out_dir + 'cur_exptime.json', 'w') as outfile:
+            json.dump(data, outfile, indent=2)
 
     return data
