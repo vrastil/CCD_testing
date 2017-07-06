@@ -104,17 +104,17 @@ def plot_all(in_dir, out_dir):
         sig1 = [x[0]['signal_e'][i] for x in chunks(data_sig, 2)] # exposure 1
         sig2 = [x[1]['signal_e'][i] for x in chunks(data_sig, 2)] # exposure 2
         sig1h = []
-        i = 0
+        k = 0
         for j, e_t in enumerate(time1):
-            if e_t == time1h[i]:
+            if e_t == time1h[k]:
                 sig1h.append(sig1[j])
-                i += 1
+                k += 1
         sig2h = []
-        i = 0
+        k = 0
         for j, e_t in enumerate(time1):
-            if e_t == time2h[i]:
+            if e_t == time2h[k]:
                 sig2h.append(sig2[j])
-                i += 1
+                k += 1
 
         # HAVE ALL DATA, GO TO PLOT
         gs = gridspec.GridSpecFromSubplotSpec(
