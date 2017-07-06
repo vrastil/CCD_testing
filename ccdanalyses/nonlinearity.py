@@ -62,11 +62,12 @@ def get_e(a_dir, out_dir=''):
             json.dump(data_l, outfile, indent=2)
 
     return data_l
- 
+
 def plot_one_seg_2exp(ax1, ax2, x1, y1, x2, y2, xlabel='', ylabel1='', ylabel2='', title=''):
     plt.rc('xtick', labelsize=10)
     plt.rc('ytick', labelsize=10)
     ax1.set_title(title, y=1.06, size=20)
+    ax1.xaxis.set_ticks([], [])
     ax2.set_xlabel(xlabel, fontsize=18)
     ax1.set_ylabel(ylabel1, fontsize=18)
     ax2.set_ylabel(ylabel2, fontsize=18)
@@ -98,11 +99,11 @@ def plot_all(in_dir, out_dir):
     current1h = data_cur_exp["current_hist"]["flat1_h"]
     current2h = data_cur_exp["current_hist"]["flat2_h"]
 
+    print 'Plotting...'
     for i in range(16):
-        print 'Plotting segment %i.' % i
         # SIGNAL FOR THIS AMPLIFIER
-        sig1 = [x[0]['signal_e'][i] for x in chunks(data_sig, 2)] # exposure 1
-        sig2 = [x[1]['signal_e'][i] for x in chunks(data_sig, 2)] # exposure 2
+        sig1 = np.array([x[0]['signal_e'][i] for x in chunks(data_sig, 2)])/1000 # exposure 1
+        sig2 = np.array([x[1]['signal_e'][i] for x in chunks(data_sig, 2)])/1000 # exposure 2
         sig1h = []
         k = 0
         for j, e_t in enumerate(time1):
@@ -124,22 +125,25 @@ def plot_all(in_dir, out_dir):
         ax1 = fig1.add_subplot(gs[0, 0])
         ax2 = fig1.add_subplot(gs[1, 0])
         plot_one_seg_2exp(ax1, ax2, time1, sig1, time2, sig2, xlabel='time [s]',
-                          ylabel1='Exp 1, signal [e]', ylabel2='Exp 2, signal [e]', title='Segment %i' % i)
+                          ylabel1='Exp 1, signal [ke]', ylabel2='Exp 2, signal [ke]', title='Segment %i' % i)
 
         # signal vs time*current [fits]
         ax1 = fig2.add_subplot(gs[0, 0])
         ax2 = fig2.add_subplot(gs[1, 0])
         plot_one_seg_2exp(ax1, ax2, -np.array(time1)*np.array(current1), sig1,
                           -np.array(time2)*np.array(current2), sig2, xlabel='time*current [nC]',
-                          ylabel1='Exp 1, signal [e]', ylabel2='Exp 2, signal [e]', title='Segment %i' % i)
+                          ylabel1='Exp 1, signal [ek]', ylabel2='Exp 2, signal [ke]', title='Segment %i' % i)
 
         # signal vs time*current [hist]
         ax1 = fig3.add_subplot(gs[0, 0])
         ax2 = fig3.add_subplot(gs[1, 0])
         plot_one_seg_2exp(ax1, ax2, -np.array(time1h)*np.array(current1h), sig1h,
                           -np.array(time2h)*np.array(current2h), sig2h, xlabel='time*current(hist) [nC]',
-                          ylabel1='Exp 1, signal [e]', ylabel2='Exp 2, signal [e]', title='Segment %i' % i)
+                          ylabel1='Exp 1, signal [ke]', ylabel2='Exp 2, signal [ke]', title='Segment %i' % i)
 
+    fig1.suptitle('Full Well, time', y=1.06-0.05*row, size=28)
+    fig2.suptitle('Full Well, time*current', y=1.06-0.05*row, size=28)
+    fig3.suptitle('Full Well, time*current [histogram method]', y=1.06-0.05*row, size=28)
     print 'Saving plots...'
     fig1.savefig(out_dir + 'sig_time.png')
     fig2.savefig(out_dir + 'sig_cur_x_time.png')
