@@ -6,13 +6,8 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
-import scipy
-from scipy import optimize
-from scipy.stats import norm
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from .file_handling import  get_files_in_traverse_dir
+from .file_handling import  get_files_in_traverse_dir, create_dir
 
 
 def load_exposure_current(a_dir):
@@ -29,7 +24,7 @@ def load_exposure_current(a_dir):
     print ''
     return data
 
-def load_all_currents(a_dir, a_json_file):
+def load_all_currents(a_dir, a_json_file, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/'):
     print 'Loading fits files:'
     data_fits = load_exposure_current(a_dir)
     print 'Loading json file...'
@@ -51,16 +46,24 @@ def load_all_currents(a_dir, a_json_file):
         d_fits, d_json = data_fits[i], data_json[i]
         exptime["flat1"].append(d_fits["exptime"])
         current["flat1"].append(d_fits["current"])
-        current_raw["flat1"].append(d_json["mu_high"])
+        current_raw["flat1"].append(-d_json["mu_high"]/1000)
         if "mu_high_hist" in d_json:
-            current_hist["flat1_h"].append(d_json["mu_high_hist"])
+            current_hist["flat1_h"].append(-d_json["mu_high_hist"]/1000)
             exptime["flat1_h"].append(d_fits["exptime"])
         d_fits, d_json = data_fits[i+1], data_json[i+1]
         exptime["flat2"].append(d_fits["exptime"])
         current["flat2"].append(d_fits["current"])
-        current_raw["flat2"].append(d_json["mu_high"])
+        current_raw["flat2"].append(-d_json["mu_high"]/1000)
         if "mu_high_hist" in d_json:
-            current_hist["flat2_h"].append(d_json["mu_high_hist"]) 
+            current_hist["flat2_h"].append(-d_json["mu_high_hist"]/1000) 
             exptime["flat2_h"].append(d_fits["exptime"])
+    
+    data = {"exptime" : exptime, "current" : current, "current_raw" : current_raw, "current_hist" : current_hist}
 
-    return exptime, current, current_raw, current_hist
+    if out_dir != '':
+        create_dir(out_dir)
+        print "Writing data to 'cur_exptime.json'"
+        with open(out_dir + 'data.json', 'w') as outfile:
+            json.dump(cur_val_list, outfile, indent=2)
+
+    return data

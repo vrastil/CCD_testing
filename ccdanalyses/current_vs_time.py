@@ -10,7 +10,7 @@ from scipy import optimize
 from scipy.stats import norm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from .file_handling import  get_files_in_traverse_dir
+from .file_handling import  get_files_in_traverse_dir, create_dir
 
 def chunks(a_list, n):
     """Yield successive n-sized chunks from l."""
@@ -206,7 +206,7 @@ def plot_current_exposure_detail_mlt(fig_files, out_dir, cur_val_list=None, show
     if ret: return fig, cur_val_list
     else: plt.close(fig); return cur_val_list
 
-def pdf_current_exposure_detail_mlt(in_dir, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/'):
+def pdf_current_exposure_detail_mlt(in_dir, out_dir=''):
     print 'Loading files...'
     files = sorted([f[0] for f in get_files_in_traverse_dir(in_dir, 'pd-values*.txt')])
     pp = PdfPages(out_dir + 'current_exposure_detail.pdf')
@@ -217,8 +217,10 @@ def pdf_current_exposure_detail_mlt(in_dir, out_dir='/gpfs/mnt/gpfs01/astro/www/
         pp.savefig(a_plot)
         plt.close(a_plot)
     pp.close()
-    print "Writing data to 'data.json'"
-    with open(out_dir + 'data.json', 'w') as outfile:
-        json.dump(cur_val_list, outfile, indent=2)
+    if out_dir != '':
+        create_dir(out_dir)
+        print "Writing data to 'data.json'"
+        with open(out_dir + 'cur_time.json', 'w') as outfile:
+            json.dump(cur_val_list, outfile, indent=2)
     print 'Everything done!'
 
