@@ -1,3 +1,4 @@
+import sys
 import json
 import numpy as np
 from astropy.io import fits
@@ -15,18 +16,23 @@ from .file_handling import  get_files_in_traverse_dir
 
 
 def load_exposure_current(a_dir):
-    files = sorted([f[0] for f in get_files_in_traverse_dir('./', '*_flat?_*.fits')])
+    files = sorted([f[0] for f in get_files_in_traverse_dir(a_dir, '*_flat?_*.fits')])
     data = []
 
-    for a_file in files:
+    for i, a_file in enumerate(files):
+        sys.stdout.write('\rLoading file %i/%i' % ((i+1), len(files)))
+        sys.stdout.flush()
         header = fits.getheader(a_file)
         current = header['MONDIODE']
         exptime = header['EXPTIME']
         data.append({"current" : current, "exptime" : exptime})
+    print ''
     return data
 
 def load_all_currents(a_dir, a_json_file):
+    print 'Loading fits files:'
     data_fits = load_exposure_current(a_dir)
+    print 'Loading json file...'
     with open(a_json_file) as data_file:
         data_json = json.loads(data_file.read())
 
@@ -39,20 +45,22 @@ def load_all_currents(a_dir, a_json_file):
     current_raw = {"flat1" : [], "flat2" : []}
     current_hist = {"flat1_h" : [], "flat2_h" : []}
 
+    print 'Organizing data...'
+
     for i in range(0, len(data_fits), 2):
         d_fits, d_json = data_fits[i], data_json[i]
         exptime["flat1"].append(d_fits["exptime"])
         current["flat1"].append(d_fits["current"])
         current_raw["flat1"].append(d_json["mu_high"])
         if "mu_high_hist" in d_json:
-            current_hist["flat1"].append(d_json["mu_high_hist"])
+            current_hist["flat1_h"].append(d_json["mu_high_hist"])
             exptime["flat1_h"].append(d_fits["exptime"])
-       d_fits, d_json = data_fits[i+1], data_json[i+1]
+        d_fits, d_json = data_fits[i+1], data_json[i+1]
         exptime["flat2"].append(d_fits["exptime"])
         current["flat2"].append(d_fits["current"])
         current_raw["flat2"].append(d_json["mu_high"])
         if "mu_high_hist" in d_json:
-            current_hist["flat2"].append(d_json["mu_high_hist"]) 
+            current_hist["flat2_h"].append(d_json["mu_high_hist"]) 
             exptime["flat2_h"].append(d_fits["exptime"])
 
     return exptime, current, current_raw, current_hist
