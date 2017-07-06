@@ -132,19 +132,20 @@ def plot_all(in_dir, out_dir):
         ax2 = fig2.add_subplot(gs[1, 0])
         plot_one_seg_2exp(ax1, ax2, -np.array(time1)*np.array(current1), sig1,
                           -np.array(time2)*np.array(current2), sig2, xlabel='time*current [nC]',
-                          ylabel1='Exp 1, signal [ek]', ylabel2='Exp 2, signal [ke]', title='Segment %i' % i)
+                          ylabel1='Exp 1, signal [ke]', ylabel2='Exp 2, signal [ke]', title='Segment %i' % i)
 
         # signal vs time*current [hist]
         ax1 = fig3.add_subplot(gs[0, 0])
         ax2 = fig3.add_subplot(gs[1, 0])
         plot_one_seg_2exp(ax1, ax2, -np.array(time1h)*np.array(current1h), sig1h,
-                          -np.array(time2h)*np.array(current2h), sig2h, xlabel='time*current(hist) [nC]',
+                          -np.array(time2h)*np.array(current2h), sig2h, xlabel='time*current [nC]',
                           ylabel1='Exp 1, signal [ke]', ylabel2='Exp 2, signal [ke]', title='Segment %i' % i)
 
-    fig1.suptitle('Full Well, time', y=1.06-0.05*row, size=28)
-    fig2.suptitle('Full Well, time*current', y=1.06-0.05*row, size=28)
-    fig3.suptitle('Full Well, time*current [histogram method]', y=1.06-0.05*row, size=28)
+    fig1.suptitle('Full Well, time', y=0.95, size=45)
+    fig2.suptitle('Full Well, time*current [MONDIODE]', y=0.95, size=45)
+    fig3.suptitle('Full Well, time*current [histogram method]', y=0.95, size=45)
     print 'Saving plots...'
     fig1.savefig(out_dir + 'sig_time.png')
     fig2.savefig(out_dir + 'sig_cur_x_time.png')
     fig3.savefig(out_dir + 'sig_cur_hist_x_time.png')
+    plt.close('all')
