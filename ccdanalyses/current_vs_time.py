@@ -70,7 +70,6 @@ def pdf_current_exposure_mlt(in_dir, out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil
 def gaussian(x, a, mean, sigma):
     return a * np.exp(-((x - mean)**2 / (2 * sigma**2)))
 
-#############################################################################
 def current_exposure_detail(data_all, gs, title='', show_labels=True):
     plt.rc('xtick', labelsize=10)
     plt.rc('ytick', labelsize=10)
@@ -173,7 +172,7 @@ def plot_current_exposure_detail(data, out_dir, title='', show=False, save=True,
     fig = plt.figure(figsize=(15, 15))
     gs0 = gridspec.GridSpec(1, 1)
     gs = gridspec.GridSpecFromSubplotSpec(
-            2, 2, hspace=0., wspace=0.05, subplot_spec=gs0[0])
+        2, 2, hspace=0., wspace=0.05, subplot_spec=gs0[0])
     cur_val = current_exposure_detail(data, gs, title=title)
     fig.suptitle('Current [pA] vs time [s]', y=0.95, size=28)
     if save: plt.savefig(out_dir + 'current_exposure_detail.png')
