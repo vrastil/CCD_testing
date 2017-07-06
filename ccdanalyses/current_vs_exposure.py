@@ -69,25 +69,27 @@ def load_all_currents(a_dir, a_json_file, out_dir=''):
     return data
 
 def plot_all_currents(data, out_dir, title=''):
+    if title == '':
+        title = 'Current [nA]'
     fig = plt.figure(figsize=(6, 10))
     plt.rc('xtick', labelsize=10)
     plt.rc('ytick', labelsize=10)
     ax1 = fig.add_subplot(211)
     ax2 = fig.add_subplot(212)
     ax1.xaxis.tick_top()
-    ax1.set_ylabel('Exposure 1, current [pA]', fontsize=18)
-    ax2.set_ylabel('Exposure 2, current [pA]', fontsize=18)
+    ax1.set_ylabel('Exp 1', fontsize=18)
+    ax2.set_ylabel('Exp 2', fontsize=18)
     ax2.set_xlabel('exposure time [s]', fontsize=18)
-    ax1.set_title(title, y=1.02, size=20)
+    ax1.set_title(title, y=1.06, size=20)
     plt.subplots_adjust(hspace=0.05)
 
-    ax1.plot(data["exptime"]["flat1"], data["current"]["flat1"], label='from fits')
-    ax1.plot(data["exptime"]["flat1"], data["current_raw"]["flat1"], label='from mean')
-    ax1.plot(data["exptime"]["flat1_h"], data["currecurrent_histnt"]["flat1_h"], label='from hist')
+    ax1.plot(data["exptime"]["flat1"], data["current"]["flat1"], label='fits')
+    ax1.plot(data["exptime"]["flat1"], data["current_raw"]["flat1"], label='mean')
+    ax1.plot(data["exptime"]["flat1_h"], data["current_hist"]["flat1_h"], label='hist')
     ax1.legend()
-    ax2.plot(data["exptime"]["flat2"], data["current"]["flat2"], label='from fits')
-    ax2.plot(data["exptime"]["flat2"], data["current_raw"]["flat2"], label='from mean')
-    ax2.plot(data["exptime"]["flat2_h"], data["currecurrent_histnt"]["flat2_h"], label='from hist')
+    ax2.plot(data["exptime"]["flat2"], data["current"]["flat2"], label='fits')
+    ax2.plot(data["exptime"]["flat2"], data["current_raw"]["flat2"], label='mean')
+    ax2.plot(data["exptime"]["flat2_h"], data["current_hist"]["flat2_h"], label='hist')
     ax2.legend()
 
     plt.savefig(out_dir + 'cur_exptime.png')
