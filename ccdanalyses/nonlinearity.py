@@ -12,7 +12,7 @@ from scipy import optimize
 from scipy.stats import norm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from .file_handling import  get_files_in_traverse_dir
+from .file_handling import  get_files_in_traverse_dir, create_dir
 
 
 def get_gains(a_dir):
@@ -24,8 +24,8 @@ def get_gains(a_dir):
     return fits.getdata(files[0])['GAIN']
 
 def get_counts(a_dir):
-    files = sorted([f[0] for f in get_files_in_traverse_dir(a_dir, '*_flat?_*.fits')])
-    data_dict = []
+    files = sorted([f[0] for f in get_files_in_traverse_dir(a_dir + 'flat_acq/', '*_flat?_*.fits')])
+    data_l = []
 
     for i, a_file in enumerate(files):
         sys.stdout.write('\rLoading file %i/%i' % ((i+1), len(files)))
@@ -33,12 +33,30 @@ def get_counts(a_dir):
 
         hdulist = fits.open(a_file)
         data = []
-        for i in range(1,17):
+        for i in range(1, 17):
             counts = hdulist[i].header["AVERAGE"]
             seg = int(hdulist[i].header["EXTNAME"][-2:])
             data.append((seg, counts))
         data = [count[1] for count in sorted(data)] # from seg 0 to 17
-        data_dict.append({"file" : a_file, "AVERAGE" : data})
+        data_l.append({"file" : a_file, "AVERAGE" : data})
         hdulist.close(a_file)
     print ''
-    return data_dict
+    return data_l
+
+def get_e(a_dir, out_dir=''):
+    print 'Loading gains'
+    gains = get_gains(a_dir)
+    print 'Loading counts'
+    counts = get_counts(a_dir)
+    data_l = []
+    for count in counts:
+        sig_e = gains*count["AVERAGE"]
+        data_l.append({"file" : count["file"], "signal_e" : sig_e})
+
+    if out_dir != '':
+        create_dir(out_dir)
+        print "Writing data to 'sig_e.json'"
+        with open(out_dir + 'sig_e.json', 'w') as outfile:
+            json.dump(data_l, outfile, indent=2)
+
+    return data_l
