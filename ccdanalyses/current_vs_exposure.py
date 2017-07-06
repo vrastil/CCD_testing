@@ -68,29 +68,47 @@ def load_all_currents(a_dir, a_json_file, out_dir=''):
 
     return data
 
-def plot_all_currents(data, out_dir, title=''):
-    if title == '':
-        title = 'Current [nA]'
+def plot_all_currents(data, out_dir):
     fig = plt.figure(figsize=(6, 10))
     plt.rc('xtick', labelsize=10)
     plt.rc('ytick', labelsize=10)
-    ax1 = fig.add_subplot(211)
-    ax2 = fig.add_subplot(212)
+
+    ax1 = fig.add_subplot(221)
+    ax2 = fig.add_subplot(222)
+    ax3 = fig.add_subplot(223)
+    ax4 = fig.add_subplot(224)
     ax1.xaxis.tick_top()
+    ax3.xaxis.tick_top()
+    ax3.yaxis.tick_right()
+    ax4.yaxis.tick_right()
     ax1.set_ylabel('Exp 1', fontsize=18)
     ax2.set_ylabel('Exp 2', fontsize=18)
     ax2.set_xlabel('exposure time [s]', fontsize=18)
-    ax1.set_title(title, y=1.06, size=20)
+    ax1.set_title('Current [nA]', y=1.06, size=20)
+    ax3.set_title('Current (residual from fits) [nA]', y=1.06, size=20)
+
+    ax3.plot(data["exptime"]["flat1"], data["current_raw"]["flat1"] - data["current"]["flat1"], label='mean')
+    x = data["exptime"]["flat1_h"]
+    y = []
+    i = 0
+    for j, e_t in enumerate(data["exptime"]["flat1"]):
+        if e_t == x[i]:
+            y.append(data["current_hist"]["flat1_h"][i] - data["current"]["flat1"][j])
+            i += 1
+    ax3.plot(x, y, label='hist')
+    ax3.legend()
+
+    ax4.plot(data["exptime"]["flat2"], data["current_raw"]["flat2"] - data["current"]["flat2"], label='mean')
+    x = data["exptime"]["flat2_h"]
+    y = []
+    i = 0
+    for j, e_t in enumerate(data["exptime"]["flat2"]):
+        if e_t == x[i]:
+            y.append(data["current_hist"]["flat2_h"][i] - data["current"]["flat2"][j])
+            i += 1
+    ax4.plot(x, y, label='hist')
+    ax4.legend()
+
     plt.subplots_adjust(hspace=0.05)
-
-    ax1.plot(data["exptime"]["flat1"], data["current"]["flat1"], label='fits')
-    ax1.plot(data["exptime"]["flat1"], data["current_raw"]["flat1"], label='mean')
-    ax1.plot(data["exptime"]["flat1_h"], data["current_hist"]["flat1_h"], label='hist')
-    ax1.legend()
-    ax2.plot(data["exptime"]["flat2"], data["current"]["flat2"], label='fits')
-    ax2.plot(data["exptime"]["flat2"], data["current_raw"]["flat2"], label='mean')
-    ax2.plot(data["exptime"]["flat2_h"], data["current_hist"]["flat2_h"], label='hist')
-    ax2.legend()
-
     plt.savefig(out_dir + 'cur_exptime.png')
     plt.close(fig)
