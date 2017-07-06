@@ -1,6 +1,5 @@
 import json
 import numpy as np
-from astropy.io import fits
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.gridspec as gridspec
