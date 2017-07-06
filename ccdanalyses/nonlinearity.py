@@ -127,19 +127,20 @@ def plot_all(in_dir, out_dir):
                           ylabel1='Exp 1, signal [e]', ylabel2='Exp 2, signal [e]', title='Segment %i' % i)
 
         # signal vs time*current [fits]
-        ax1 = fig1.add_subplot(gs[0, 0])
-        ax2 = fig1.add_subplot(gs[1, 0])
+        ax1 = fig2.add_subplot(gs[0, 0])
+        ax2 = fig2.add_subplot(gs[1, 0])
         plot_one_seg_2exp(ax1, ax2, -np.array(time1)*np.array(current1), sig1,
                           -np.array(time2)*np.array(current2), sig2, xlabel='time*current [nC]',
                           ylabel1='Exp 1, signal [e]', ylabel2='Exp 2, signal [e]', title='Segment %i' % i)
 
         # signal vs time*current [hist]
-        ax1 = fig1.add_subplot(gs[0, 0])
-        ax2 = fig1.add_subplot(gs[1, 0])
+        ax1 = fig3.add_subplot(gs[0, 0])
+        ax2 = fig3.add_subplot(gs[1, 0])
         plot_one_seg_2exp(ax1, ax2, -np.array(time1h)*np.array(current1h), sig1h,
                           -np.array(time2h)*np.array(current2h), sig2h, xlabel='time*current(hist) [nC]',
                           ylabel1='Exp 1, signal [e]', ylabel2='Exp 2, signal [e]', title='Segment %i' % i)
 
+    print 'Saving plots...'
     fig1.savefig(out_dir + 'sig_time.png')
     fig2.savefig(out_dir + 'sig_cur_x_time.png')
     fig3.savefig(out_dir + 'sig_cur_hist_x_time.png')
