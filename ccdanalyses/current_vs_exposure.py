@@ -72,6 +72,7 @@ def plot_all_currents(data, out_dir):
     fig = plt.figure(figsize=(12, 10))
     plt.rc('xtick', labelsize=10)
     plt.rc('ytick', labelsize=10)
+    plt.rcParams['legend.numpoints'] = 1
 
     ax1 = fig.add_subplot(221)
     ax2 = fig.add_subplot(223)
@@ -81,6 +82,8 @@ def plot_all_currents(data, out_dir):
     ax3.xaxis.tick_top()
     ax3.yaxis.tick_right()
     ax4.yaxis.tick_right()
+    ax3.set_yscale('symlog', lintresh=0.015)
+    ax4.set_yscale('symlog', lintresh=0.015)
     ax1.set_ylabel('Exp 1', fontsize=18)
     ax2.set_ylabel('Exp 2', fontsize=18)
     ax2.set_xlabel('exposure time [s]', fontsize=18)
@@ -91,11 +94,11 @@ def plot_all_currents(data, out_dir):
     ax1.plot(data["exptime"]["flat1"], data["current"]["flat1"], 'o-', label='fits')
     ax1.plot(data["exptime"]["flat1"], data["current_raw"]["flat1"], 'o-', label='mean')
     ax1.plot(data["exptime"]["flat1_h"], data["current_hist"]["flat1_h"], 'o-', label='hist')
-    ax1.legend()
+    ax1.legend(bbox_to_anchor=(1.2, 1.0))
     ax2.plot(data["exptime"]["flat2"], data["current"]["flat2"], 'o-', label='fits')
     ax2.plot(data["exptime"]["flat2"], data["current_raw"]["flat2"], 'o-', label='mean')
     ax2.plot(data["exptime"]["flat2_h"], data["current_hist"]["flat2_h"], 'o-', label='hist')
-    ax2.legend()
+    ax2.legend(bbox_to_anchor=(1.2, 1.0))
 
     y = np.array(data["current_raw"]["flat1"]) - np.array(data["current"]["flat1"])
     ax3.plot(data["exptime"]["flat1"], y,  'o-', label='mean')
