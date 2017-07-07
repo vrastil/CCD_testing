@@ -82,8 +82,6 @@ def plot_all_currents(data, out_dir):
     ax3.xaxis.tick_top()
     ax3.yaxis.tick_right()
     ax4.yaxis.tick_right()
-    ax3.set_yscale('symlog', lintresh=0.015)
-    ax4.set_yscale('symlog', lintresh=0.015)
     ax1.set_ylabel('Exp 1', fontsize=18)
     ax2.set_ylabel('Exp 2', fontsize=18)
     ax2.set_xlabel('exposure time [s]', fontsize=18)
