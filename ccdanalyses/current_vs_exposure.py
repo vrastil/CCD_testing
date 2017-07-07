@@ -88,17 +88,17 @@ def plot_all_currents(data, out_dir):
     ax1.set_title('Current [nA]', y=1.06, size=20)
     ax3.set_title('Current (residual from fits) [nA]', y=1.06, size=20)
 
-    ax1.plot(data["exptime"]["flat1"], data["current"]["flat1"], label='fits')
-    ax1.plot(data["exptime"]["flat1"], data["current_raw"]["flat1"], label='mean')
-    ax1.plot(data["exptime"]["flat1_h"], data["current_hist"]["flat1_h"], label='hist')
+    ax1.plot(data["exptime"]["flat1"], data["current"]["flat1"], 'o-', label='fits')
+    ax1.plot(data["exptime"]["flat1"], data["current_raw"]["flat1"], 'o-', label='mean')
+    ax1.plot(data["exptime"]["flat1_h"], data["current_hist"]["flat1_h"], 'o-', label='hist')
     ax1.legend()
-    ax2.plot(data["exptime"]["flat2"], data["current"]["flat2"], label='fits')
-    ax2.plot(data["exptime"]["flat2"], data["current_raw"]["flat2"], label='mean')
-    ax2.plot(data["exptime"]["flat2_h"], data["current_hist"]["flat2_h"], label='hist')
+    ax2.plot(data["exptime"]["flat2"], data["current"]["flat2"], 'o-', label='fits')
+    ax2.plot(data["exptime"]["flat2"], data["current_raw"]["flat2"], 'o-', label='mean')
+    ax2.plot(data["exptime"]["flat2_h"], data["current_hist"]["flat2_h"], 'o-', label='hist')
     ax2.legend()
 
     y = np.array(data["current_raw"]["flat1"]) - np.array(data["current"]["flat1"])
-    ax3.plot(data["exptime"]["flat1"], y,  label='mean')
+    ax3.plot(data["exptime"]["flat1"], y,  'o-', label='mean')
     x = data["exptime"]["flat1_h"]
     y = []
     i = 0
@@ -106,11 +106,11 @@ def plot_all_currents(data, out_dir):
         if e_t == x[i]:
             y.append(data["current_hist"]["flat1_h"][i] - data["current"]["flat1"][j])
             i += 1
-    ax3.plot(x, y, label='hist')
+    ax3.plot(x, y, 'o-', label='hist')
     ax3.legend()
 
     y = np.array(data["current_raw"]["flat2"]) - np.array(data["current"]["flat2"])
-    ax4.plot(data["exptime"]["flat2"], y, label='mean')
+    ax4.plot(data["exptime"]["flat2"], y, 'o-', label='mean')
     x = data["exptime"]["flat2_h"]
     y = []
     i = 0
@@ -118,7 +118,7 @@ def plot_all_currents(data, out_dir):
         if e_t == x[i]:
             y.append(data["current_hist"]["flat2_h"][i] - data["current"]["flat2"][j])
             i += 1
-    ax4.plot(x, y, label='hist')
+    ax4.plot(x, y, 'o-', label='hist')
     ax4.legend()
 
     plt.subplots_adjust(hspace=0.05)
