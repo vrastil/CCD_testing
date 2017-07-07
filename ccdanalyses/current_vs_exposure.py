@@ -68,6 +68,32 @@ def load_all_currents(a_dir, a_json_file, out_dir=''):
 
     return data
 
+def add_sigma_to_json(cur_time_json, cur_exptime_json):
+    """ cur_time : mu, sigma from currents
+        cur_exptime : all currents, exptime
+        """
+    with open(cur_time_json) as data_file:
+        cur_time = json.loads(data_file.read())
+    with open(cur_exptime_json) as data_file:
+        cur_exptime = json.loads(data_file.read())
+    sigma = {"flat1" : [], "flat2" : []}
+    sigma_h = {"flat1_h" : [], "flat2_h" : []}
+
+    for i in range(0, len(cur_time), 2):
+        rec = cur_time[i]
+        sigma['flat1'].append(rec['sigma_high'])
+        if 'sigma_high_hist' in rec:
+            sigma_h["flat1_h"].append(rec['sigma_high_hist'])
+        rec = cur_time[i+1]
+        sigma['flat2'].append(rec['sigma_high'])
+        if 'sigma_high_hist' in rec:
+            sigma_h["flat2_h"].append(rec['sigma_high_hist'])
+    cur_exptime["sigma"] = sigma
+    cur_exptime["sigma_hist"] = sigma_h
+    print "Writing data to 'cur_exptime.json'"
+    with open(cur_exptime_json, 'w') as outfile:
+        json.dump(cur_exptime, outfile, indent=2)
+
 def plot_all_currents(data, out_dir):
     fig = plt.figure(figsize=(12, 10))
     plt.rc('xtick', labelsize=10)
@@ -124,4 +150,32 @@ def plot_all_currents(data, out_dir):
 
     plt.subplots_adjust(hspace=0.05)
     plt.savefig(out_dir + 'cur_exptime.png')
+    plt.close(fig)
+
+def plot_all_currents_std(a_json_file, out_dir):
+    with open(a_json_file) as data_file:
+        data = json.loads(data_file.read())
+
+    fig = plt.figure(figsize=(8, 10))
+    plt.rc('xtick', labelsize=10)
+    plt.rc('ytick', labelsize=10)
+    plt.rcParams['legend.numpoints'] = 1
+
+    ax1 = fig.add_subplot(211)
+    ax2 = fig.add_subplot(212)
+    ax1.xaxis.tick_top()
+    ax1.set_ylabel('Exp 1', fontsize=18)
+    ax2.set_ylabel('Exp 2', fontsize=18)
+    ax2.set_xlabel('exposure time [s]', fontsize=18)
+    ax1.set_title('Std of current [nA]', y=1.06, size=20)
+
+    ax1.plot(data["exptime"]["flat1"], data["sigma"]["flat1"], 'o-', label='raw')
+    ax1.plot(data["exptime"]["flat1_h"], data["sigma_hist"]["flat1_h"], 'o-', label='hist')
+    ax1.legend()
+    ax2.plot(data["exptime"]["flat2"], data["sigma"]["flat2"], 'o-', label='raw')
+    ax2.plot(data["exptime"]["flat2_h"], data["sigma_hist"]["flat2_h"], 'o-', label='hist')
+    ax2.legend()
+
+    plt.subplots_adjust(hspace=0.05)
+    plt.savefig(out_dir + 'std_cur_exptime.png')
     plt.close(fig)
