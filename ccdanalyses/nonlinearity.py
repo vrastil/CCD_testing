@@ -35,7 +35,7 @@ def get_counts(a_dir):
         hdulist = fits.open(a_file)
         data = []
         for i in range(1, 17):
-            counts = hdulist[i].header["AVERAGE"]
+            counts = hdulist[i].header["AVERAGE"] - hdulist[i].header["AVGBIAS"]
             seg = int(hdulist[i].header["EXTNAME"][-2:])
             data.append((seg, counts))
         data = [count[1] for count in sorted(data)] # from seg 0 to 17
