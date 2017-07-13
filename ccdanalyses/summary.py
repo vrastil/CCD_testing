@@ -221,9 +221,9 @@ def plot_one(data, subplot_spec, axhline=None, fit=False, res=False):
         ax4.axhline(y=axhline, color='r', linestyle='--')
     
     if fit or res:
-        bias = 3.64
+        bias = 0
         lin_low = 1 + bias
-        lin_high = 100 + bias
+        lin_high = 90 + bias
 
         dy = np.array(data.y1[0])
         dx = np.array(data.x1[0])
