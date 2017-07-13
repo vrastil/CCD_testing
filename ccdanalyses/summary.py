@@ -60,9 +60,9 @@ class Data(object):
 
 def get_save_data(in_dir, out_dir=None):
     """
-    load all neccessary data from json files, create Data objects and 
+    load all neccessary data from json files, create Data objects and
     saves them into new json files specific to individual plots
-    in_dir' must contain json files:
+    *in_dir* must contain json files:
     sig_e.json : for each files  16 segments with signal in electrons
     cur_exptime.json : for each file (exposure 'flat1' or 'flat2') measured currents
     """
@@ -318,7 +318,9 @@ def plot_all(in_dir, out_dir):
     plot_one_cor(flux_time_cur_hist_cor, gs1[1], fit=True)
     plot_one_cor(flux_time_cur_cor, gs1[2], res=True)
     plot_one_cor(flux_time_cur_hist_cor, gs1[3], res=True)
-    plt.show()
+    
+    fig1.savefig(out_dir + 'summary.png')
+    fig2.savefig(out_dir + 'summary_corrected.png')
 
 def correct_lin(flux_time_cur, cur_std_time, dim=0, info=''):
     data = {}
