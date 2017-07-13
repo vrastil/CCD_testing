@@ -218,6 +218,11 @@ def plot_all_currents_std_detail(a_json_file, out_dir):
     ax3.plot(data["exptime"]["flat1_h"], data["sigma_hist"]["flat1_h"], 'o-', label='hist')
     ax4.plot(data["exptime"]["flat2"], data["sigma"]["flat2"], 'o-', label='raw')
     ax4.plot(data["exptime"]["flat2_h"], data["sigma_hist"]["flat2_h"], 'o-', label='hist')
+
+    ax1.axhline(y=500, color='r', ls='--')
+    ax2.axhline(y=500, color='r', ls='--')
+    ax3.axhline(y=500, color='r', ls='--')
+    ax4.axhline(y=500, color='r', ls='--')
     ax3.legend()
     ax4.legend()
 
