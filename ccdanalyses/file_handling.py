@@ -26,6 +26,11 @@ def create_dir(out_dir):
         print "Creating outdir '%s'" % out_dir
         os.makedirs(out_dir)
 
+def chunks(a_list, n):
+    """Yield successive n-sized chunks from l."""
+    for i in range(0, len(a_list), n):
+        yield a_list[i:i + n]
+
 _DEV_INDEX = ['S22', 'S12', 'S02', 'S21', 'S11', 'S01', 'S20', 'S10', 'S00']
 _DEV_INDEX_TR = ['S22', 'S21', 'S20', 'S12', 'S11', 'S10', 'S02', 'S01', 'S00']
 
