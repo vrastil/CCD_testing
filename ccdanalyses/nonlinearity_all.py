@@ -11,6 +11,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
+import scipy.integrate
 
 from .file_handling import get_files_in_traverse_dir
 
@@ -125,9 +126,15 @@ def load_raw_data(run_dir='/gpfs/mnt/gpfs01/astro/workarea/ccdtest/prod/e2v-CCD/
     if load_txt:
         load_txt_files(raw_data, run_dir)
         get_gains_to_e(raw_data, run_dir)
+    save_json_data(raw_data, out_file)
+
+def save_json_data(raw_data, out_file):
+    print "Converting to json format..."
+    for rec in raw_data:
+        for key, value in rec.iteritems():
+            if isinstance(value, np.ndarray): rec[key] = value.tolist()
     with open(out_file, 'w') as outfile:
         json.dump(raw_data, outfile, indent=2)
-    return raw_data
 
 def load_json_data(data_file='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/E2V-CCD250-281/4785/data/data.json'):
     """ load data already stored in json file """
@@ -205,6 +212,7 @@ def load_txt_files(raw_data, run_dir):
             print 'WARNING! Unmatching flat files!'
         raw_data[seq]["TXT_FILENAME"] = a_file
         get_txt_info(a_file, raw_data[seq])
+    print ''
 
 
 def get_txt_info(a_file, data):
@@ -240,6 +248,6 @@ def get_txt_info(a_file, data):
     data["TXT_I*T+-"] = data["TXT_CURRENT_MEAN+-"] * \
         (data["TXT_STOP-"] - data["TXT_START+"])
     data["TXT_I*dt"] = scipy.integrate.simps(
-        current[start_ind_n:, stop_ind_p], time[start_ind_n:, stop_ind_p])
+        current[start_ind_n:stop_ind_p], time[start_ind_n:stop_ind_p])
     data["TXT_DIFF_CURRENT_MEAN"] = np.mean(np.abs(dc[start_ind_p:stop_ind_n]))
     data["TXT_DIFF_CURRENT_SIGMA"] = np.std(dc[start_ind_p:stop_ind_n])
