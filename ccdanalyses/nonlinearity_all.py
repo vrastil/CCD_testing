@@ -207,7 +207,7 @@ def save_json_data(raw_data, out_file):
     with open(out_file, 'w') as outfile:
         json.dump(raw_data, outfile, indent=2)
 
-def load_json_data(data_file='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/E2V-CCD250-281/4785/data/data.json'):
+def load_json_data(data_file='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/E2V-CCD250-281/4785/data/all.json'):
     """ load data already stored in json file """
     with open(data_file) as infile:
         data = json.loads(infile.read())
@@ -320,6 +320,6 @@ def get_txt_info(a_file, data):
         (data["TXT_STOP-"] - data["TXT_START+"])
     data["TXT_I*dt"] = scipy.integrate.simps(
         current[start_ind_n:stop_ind_p], time[start_ind_n:stop_ind_p])
-    data["TXT_DIFF_CURRENT_MEAN"] = np.median(np.abs(dc[start_ind_p:stop_ind_n]))
-    data["TXT_DIFF_CURRENT_MEDIAN"] = np.mean(np.abs(dc[start_ind_p:stop_ind_n]))
+    data["TXT_DIFF_CURRENT_MEAN"] = np.mean(np.abs(dc[start_ind_p:stop_ind_n]))
+    data["TXT_DIFF_CURRENT_MEDIAN"] = np.median(np.abs(dc[start_ind_p:stop_ind_n]))
     data["TXT_DIFF_CURRENT_SIGMA"] = np.std(np.abs(dc[start_ind_p:stop_ind_n]))
