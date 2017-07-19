@@ -16,29 +16,73 @@ import scipy.integrate
 from .file_handling import get_files_in_traverse_dir
 
 def plot_all(data_file='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/E2V-CCD250-281/4785/data/data.json',
-             out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/E2V-CCD250-281/4785/'):
+             out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/E2V-CCD250-281/4785/',
+             flat=1, fit_w=False):
+    # all plots
     data = load_json_data(data_file=data_file)
-
+    div_Q = 150
+    fig = plt.figure(figsize=(20, 40))
+    gs0 = gridspec.GridSpec(4, 1, hspace=0.3)
+    seg = 0
+    xlabel = 'time*current [nC]'
+    ylabel = 'residuals'
+    y = [record["FITS_E"][seg]/1000 for record in data if record['FLAT'] == flat]
+    yerr = [record["FITS_E_STD"][seg]/1000 for record in data if record['FLAT'] == flat]
+    if fit_w:
+        suptitle_ = ', weighted fit'
+        out_dir += 'residuals_weighted.png'
+    else:
+        suptitle_ = ', non-weighted fit'
+        out_dir += 'residuals_nonweighted.png'
+    
     # fits Q = <I> * T
-    x = [record["FITS_EXPTIME"]*record["FITS_CURRENT"] for record in data]
-    y = [record["FITS_E"] for record in data]
-
+    x = [-record['FITS_I*T'] for record in data if record['FLAT'] == flat]
+    suptitle = 'FITS values' + suptitle_
+    fits_data = Data(x=[x], y=[y], yerr=[yerr], div_x=div_Q, suptitle=suptitle, ylabel=ylabel, xlabel=xlabel)
+    fits_data.plot(gs0[0], res=True, fit_w=fit_w)
+    del x, fits_data
+    
+    # txt Q = <I> * T, -+
+    x = [record["TXT_I*T-+"] for record in data if record['FLAT'] == flat]
+    suptitle = 'TXT values (broad)' + suptitle_
+    fits_data = Data(x=[x], y=[y], yerr=[yerr], div_x=div_Q, suptitle=suptitle, ylabel=ylabel, xlabel=xlabel)
+    fits_data.plot(gs0[1], res=True, fit_w=fit_w)
+    del x, fits_data
+    
+    # txt Q = <I> * T, +1
+    x = [record["TXT_I*T+-"] for record in data if record['FLAT'] == flat]
+    suptitle = 'TXT values (narrow)' + suptitle_
+    fits_data = Data(x=[x], y=[y], yerr=[yerr], div_x=div_Q, suptitle=suptitle, ylabel=ylabel, xlabel=xlabel)
+    fits_data.plot(gs0[2], res=True, fit_w=fit_w)
+    del x, fits_data
+    
+    # txt Q = I dt
+    x = [record["TXT_I*dt"] for record in data if record['FLAT'] == flat]
+    suptitle = 'TXT values (integrated)' + suptitle_
+    fits_data = Data(x=[x], y=[y], yerr=[yerr], div_x=div_Q, suptitle=suptitle, ylabel=ylabel, xlabel=xlabel)
+    fits_data.plot(gs0[3], res=True, fit_w=fit_w)
+    del x, fits_data
+    
+    plt.savefig(out_dir)
+    plt.close(fig)
 
 class Data(object):
     """
     class containing all information needed for individual plots, i.e.:
         x =[n], div_x, y = [n], leg = [n], suptitle, xlabel
     """
-    def __init__(self, x=None, div_x=0, y=None, leg=None, suptitle='', xlabel='', info=''):
+    def __init__(self, x=None, div_x=0, y=None, yerr=None, leg=None, suptitle='', xlabel='', ylabel='', info=''):
         self.x = x # n lists
         self.div_x = div_x # one number
         self.y = y # n lists
+        self.yerr = yerr # n lists
         self.leg = leg # n strings
         self.suptitle = suptitle # one string
         self.xlabel = xlabel # one string
+        self.ylabel = ylabel # one string
         self.info = info # one string
 
-    def plot(self, subplot_spec, axhline=None, fit=False, res=False):
+    def plot(self, subplot_spec, axhline=None, fit=False, res=False, yerr=False, fit_w=False, ylog=False):
         gs1 = gridspec.GridSpecFromSubplotSpec(
                 1, 2, wspace=0., subplot_spec=subplot_spec)
         ax1 = plt.subplot(gs1[0])
@@ -50,27 +94,42 @@ class Data(object):
         ax1.yaxis.set_tick_params(labelsize=18)
         ax2.yaxis.set_tick_params(labelsize=18)
 
-        ax1.set_ylabel(self.suptitle, fontsize=24)
+        ax1.set_ylabel(self.ylabel, fontsize=24)
         ax1.set_xlabel(self.xlabel, fontsize=24)
+        ax1.set_title(self.suptitle, x=1., y=1.05, fontsize=30)
         ax1.xaxis.set_label_coords(1., -0.1)
+
         ax1.set_xlim(xmax=self.div_x)
         ax2.set_xlim(xmin=self.div_x, xmax=np.max(self.x[0]))
-        ylim = np.min([np.min(y) for y in self.y]), np.max([np.max(y) for y in self.y])
-        yrange = (ylim[1] - ylim[0])*1.05
-        ylim = ylim[1] - yrange, ylim[0] + yrange
-        ax1.set_ylim(ylim)
-        ax2.set_ylim(ylim)
+
+        if ylog:
+            ax1.set_yscale('log')
+            ax2.set_yscale('log')
+        else:
+            ylim = np.min([np.min(y) for y in self.y]), np.max([np.max(y) for y in self.y])
+            yrange = (ylim[1] - ylim[0])*1.05
+            ylim = ylim[1] - yrange, ylim[0] + yrange
+            ax1.set_ylim(ylim)
+            ax2.set_ylim(ylim)
 
         if self.leg is None:
             self.leg = [None] * len(self.x)
+            show_leg = False
+        else:
+            show_leg = True
         if fit:
             ls = 'o'
         else:
             ls = 'o-'
         if not res:
-            for x1, y1, leg in zip(self.x, self.y, self.leg):
-                ax1.plot(x1, y1, ls, label=leg)
-                ax2.plot(x1, y1, ls, label=leg)
+            if not yerr:
+                for x1, y1, leg in zip(self.x, self.y, self.leg):
+                    ax1.plot(x1, y1, ls, label=leg)
+                    ax2.plot(x1, y1, ls, label=leg)
+            else:
+                for x1, y1, y1err, leg in zip(self.x, self.y, self.yerr, self.leg):
+                    ax1.errorbar(x1, y1, yerr=y1err, fmt=ls, label=leg)
+                    ax2.errorbar(x1, y1, yerr=y1err, fmt=ls, label=leg)
         if axhline is not None:
             ax1.axhline(y=axhline, color='r', linestyle='--')
             ax2.axhline(y=axhline, color='r', linestyle='--')
@@ -79,10 +138,14 @@ class Data(object):
             lin_high = 90
 
             dy = np.array(self.y[0])
+            dyerr = np.array(self.yerr[0])
             dx = np.array(self.x[0])
             cut1 = np.where(dy > lin_low)[0]
             cut2 = np.where(dy[cut1] < lin_high)[0]
-            f1 = np.poly1d(np.polyfit(dx[cut1][cut2], dy[cut1][cut2], 1))
+            if fit_w:
+                f1 = np.poly1d(np.polyfit(dx[cut1][cut2], dy[cut1][cut2], 1, w=1/dyerr[cut1][cut2]))
+            else:
+                f1 = np.poly1d(np.polyfit(dx[cut1][cut2], dy[cut1][cut2], 1))
 
             xlin_low1 = (f1-lin_low).roots[0]
             xlin_high1 = (f1-lin_high).roots[0]
@@ -91,12 +154,20 @@ class Data(object):
             ax2.plot(self.x[0], f1(self.x[0]), '-')
         if res:
             res1 = (np.array(self.y[0]) - f1(self.x[0]))/f1(self.x[0])
+            reserr = np.array(self.yerr[0])/f1(self.x[0])
             ax1.autoscale(axis='y')
             ax2.autoscale(axis='y')
-            ax1.set_yscale('symlog', linthreshy=0.1)
-            ax2.set_yscale('symlog', linthreshy=0.1)
-            ax1.plot(self.x[0], res1, 'o')
-            ax2.plot(self.x[0], res1, 'o')
+        #    ax1.set_yscale('symlog', linthreshy=0.1)
+        #    ax2.set_yscale('symlog', linthreshy=0.1)
+            ylim = -0.1, 0.1
+            ax1.set_ylim(ylim)
+            ax2.set_ylim(ylim)
+            if yerr:
+                ax1.errorbar(self.x[0], res1, yerr=reserr, fmt='o')
+                ax2.errorbar(self.x[0], res1, yerr=reserr, fmt='o')
+            else:
+                ax1.plot(self.x[0], res1, 'o')
+                ax2.plot(self.x[0], res1, 'o')
 
             ax1.axhline(y=0, color='r', linestyle='--')
             ax2.axhline(y=0, color='r', linestyle='--')
@@ -109,7 +180,7 @@ class Data(object):
             ax1.axvline(x=xlin_high1, color='b', linestyle='--')
             ax2.axvline(x=xlin_low1, color='b', linestyle='--')
             ax2.axvline(x=xlin_high1, color='b', linestyle='--')
-        if np.array(self.leg).any.any() is not None:
+        if show_leg:
             ax2.legend(bbox_to_anchor=(0.08, 1.0))
 
 def load_raw_data(run_dir='/gpfs/mnt/gpfs01/astro/workarea/ccdtest/prod/e2v-CCD/E2V-CCD250-281/4785/',
