@@ -320,5 +320,6 @@ def get_txt_info(a_file, data):
         (data["TXT_STOP-"] - data["TXT_START+"])
     data["TXT_I*dt"] = scipy.integrate.simps(
         current[start_ind_n:stop_ind_p], time[start_ind_n:stop_ind_p])
-    data["TXT_DIFF_CURRENT_MEAN"] = np.mean(np.abs(dc[start_ind_p:stop_ind_n]))
-    data["TXT_DIFF_CURRENT_SIGMA"] = np.std(dc[start_ind_p:stop_ind_n])
+    data["TXT_DIFF_CURRENT_MEAN"] = np.median(np.abs(dc[start_ind_p:stop_ind_n]))
+    data["TXT_DIFF_CURRENT_MEDIAN"] = np.mean(np.abs(dc[start_ind_p:stop_ind_n]))
+    data["TXT_DIFF_CURRENT_SIGMA"] = np.std(np.abs(dc[start_ind_p:stop_ind_n]))
