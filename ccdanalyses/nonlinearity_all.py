@@ -396,9 +396,9 @@ def get_txt_info(a_file, data):
 
     abs_cur = np.abs(dc[start_ind_p:stop_ind_n])
     data["TXT_DIFF_CURRENT_MEAN"] = np.mean(abs_cur)
-    data["TXT_DIFF_CURRENT2_MEAN"] = (np.mean(abs_cur*abs_cur))^(1/2.)
-    data["TXT_DIFF_CURRENT3_MEAN"] = (np.mean(abs_cur*abs_cur*abs_cur))^(1/3.)
-    data["TXT_DIFF_CURRENT4_MEAN"] = (np.mean(abs_cur*abs_cur*abs_cur*abs_cur))^(1/4.)
+    data["TXT_DIFF_CURRENT2_MEAN"] = (np.mean(abs_cur*abs_cur))**(1/2.)
+    data["TXT_DIFF_CURRENT3_MEAN"] = (np.mean(abs_cur*abs_cur*abs_cur))**(1/3.)
+    data["TXT_DIFF_CURRENT4_MEAN"] = (np.mean(abs_cur*abs_cur*abs_cur*abs_cur))**(1/4.)
     data["TXT_DIFF_CURRENT_MEDIAN"] = np.median(abs_cur)
     data["TXT_DIFF_CURRENT_MEDIAN80"] = np.percentile(abs_cur, 80)
     data["TXT_DIFF_CURRENT_MEDIAN90"] = np.percentile(abs_cur, 90)
