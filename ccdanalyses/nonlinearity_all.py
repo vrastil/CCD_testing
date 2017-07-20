@@ -66,6 +66,74 @@ def plot_all(data_file='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/non
     plt.savefig(out_dir)
     plt.close(fig)
 
+def plot_fits_w_nw(data_file='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/E2V-CCD250-281/4785/data/data.json',
+             out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/E2V-CCD250-281/4785/'):
+    # all plots
+    data = load_json_data(data_file=data_file)
+    div_Q = 150
+    fig = plt.figure(figsize=(20, 40))
+    gs0 = gridspec.GridSpec(4, 1, hspace=0.3)
+    seg = 0
+    xlabel = 'time*current [nC]'
+    ylabel = 'residuals'
+    out_dir += 'residuals_fits_comp.png'
+
+    #flat 1
+    flat = 1
+    y = [record["FITS_E"][seg]/1000 for record in data if record['FLAT'] == flat]
+    yerr = [record["FITS_E_STD"][seg]/1000 for record in data if record['FLAT'] == flat]
+    x = [-record['FITS_I*T'] for record in data if record['FLAT'] == flat]
+    suptitle = 'FITS values, flat 1, non-weighted fit'
+    fits_data = Data(x=[x], y=[y], yerr=[yerr], div_x=div_Q, suptitle=suptitle, ylabel=ylabel, xlabel=xlabel)
+    fits_data.plot(gs0[0], res=True, fit_w=False)
+    fits_data.suptitle = 'FITS values, flat 1, weighted fit'
+    fits_data.plot(gs0[2], res=True, fit_w=True)
+    del x, y, yerr, fits_data
+
+    #flat 2
+    flat = 2
+    y = [record["FITS_E"][seg]/1000 for record in data if record['FLAT'] == flat]
+    yerr = [record["FITS_E_STD"][seg]/1000 for record in data if record['FLAT'] == flat]
+    x = [-record['FITS_I*T'] for record in data if record['FLAT'] == flat]
+    suptitle = 'FITS values, flat 2, non-weighted fit'
+    fits_data = Data(x=[x], y=[y], yerr=[yerr], div_x=div_Q, suptitle=suptitle, ylabel=ylabel, xlabel=xlabel)
+    fits_data.plot(gs0[1], res=True, fit_w=False)
+    fits_data.suptitle = 'FITS values, flat 1, weighted fit'
+    fits_data.plot(gs0[3], res=True, fit_w=True)
+    del x, y, yerr, fits_data
+
+    plt.savefig(out_dir)
+    plt.close(fig)
+
+def plot_cur_diff(data_file, out_dir, flat=1):
+    # all plots
+    data = load_json_data(data_file=data_file)
+    fig = plt.figure(figsize=(20, 15))
+    gs0 = gridspec.GridSpec(1, 1, hspace=0.3)
+    xlabel = 'time*current [nC]'
+    div_x = 150
+    x = [-record['FITS_I*T'] for record in data if record['FLAT'] == flat]
+#    xlabel = 'time [s]'
+#    x = [record['FITS_EXPTIME'] for record in data if record['FLAT'] == flat]
+#    div_x = 10
+    
+    y1 = [record["TXT_DIFF_CURRENT_SIGMA"] for record in data if record['FLAT'] == flat]
+    y2 = [record["TXT_DIFF_CURRENT_MEAN"] for record in data if record['FLAT'] == flat]
+    y3 = [record["TXT_DIFF_CURRENT_MEDIAN"] for record in data if record['FLAT'] == flat]
+    y4 = [record["TXT_DIFF_CURRENT_MEDIAN80"] for record in data if record['FLAT'] == flat]
+    y5 = [record["TXT_DIFF_CURRENT_MEDIAN90"] for record in data if record['FLAT'] == flat]
+    y6 = [record["TXT_DIFF_CURRENT_MEDIAN95"] for record in data if record['FLAT'] == flat]
+    y7 = [record["TXT_DIFF_CURRENT_MEDIAN97"] for record in data if record['FLAT'] == flat]
+    cur = np.array([-record["FITS_CURRENT"] for record in data if record['FLAT'] == flat])
+
+    suptitle = 'TXT diff current'
+#    fits_data = nl.Data(x=[x, x, x], y=[y1, y2, y3], leg=['sigma', 'mean', 'median'],
+#                        div_x=div_x, suptitle=suptitle, xlabel=xlabel)
+    fits_data = Data(x=[x, x, x, x], y=[y4, y5, y6, y7], leg=['80', '90', '95', '97'],
+                        div_x=div_x, suptitle=suptitle, xlabel=xlabel)
+    fits_data.plot(gs0[0], ylog=True)
+    del x, fits_data
+
 class Data(object):
     """
     class containing all information needed for individual plots, i.e.:
