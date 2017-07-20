@@ -251,6 +251,11 @@ class Data(object):
         if show_leg:
             ax2.legend(bbox_to_anchor=(0.08, 1.0))
 
+def reload_txt(data_file='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/E2V-CCD250-281/4785/data/all.json',
+               run_dir='/gpfs/mnt/gpfs01/astro/workarea/ccdtest/prod/e2v-CCD/E2V-CCD250-281/4785/'):
+    data = load_json_data(data_file=data_file)
+    load_raw_data(run_dir=run_dir, out_file=data_file, load_fits=False, raw_data=data)
+
 def load_raw_data(run_dir='/gpfs/mnt/gpfs01/astro/workarea/ccdtest/prod/e2v-CCD/E2V-CCD250-281/4785/',
                   out_file='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/E2V-CCD250-281/4785/data/all.json',
                   load_fits=True, load_txt=True, raw_data=None):
