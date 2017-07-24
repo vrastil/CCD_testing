@@ -12,12 +12,13 @@ matplotlib.use('Agg')
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import scipy.integrate
-import scipy.stats.mstats
+# import scipy.stats.mstats
 
 from .file_handling import get_files_in_traverse_dir, chunks, create_dir
 
 def analyze_all(runs=None, runs_dir='/gpfs/mnt/gpfs01/astro/workarea/ccdtest/prod/e2v-CCD/',
-                out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/'):
+                out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/',
+                load_data=True):
     if runs is None:
         runs = [
             'E2V-CCD250-281/4785/',
@@ -35,9 +36,10 @@ def analyze_all(runs=None, runs_dir='/gpfs/mnt/gpfs01/astro/workarea/ccdtest/pro
         create_dir(out_file)
         out_file += 'all.json'
         try:
-            load_raw_data(run_dir=run_dir, out_file=out_file)
+            if load_data:
+                load_raw_data(run_dir=run_dir, out_file=out_file)
             print 'Plotting...'
-            plot_corrected_w_comp(out_file, out_dir+run, title='%s, segment 0')
+            plot_corrected_w_comp(out_file, out_dir+run, title='%s, segment 0' % run)
         except:
             print "Ooops. Something went wrong. Continuing with the next run."
     print "Everything done!"
@@ -561,26 +563,26 @@ def get_txt_info(a_file, data):
     data["TXT_I*dt"] = scipy.integrate.simps(
         current[start_ind_n:stop_ind_p], time[start_ind_n:stop_ind_p])
 
-    extra_cut = 2
-    current_cut = current[start_ind_p+extra_cut:stop_ind_p-extra_cut]
-    try:
-        k2, p = scipy.stats.mstats.normaltest(current_cut)
-    except ValueError:
-        k2, p = None, None
-    data["TXT_CURRENT_K2"] = k2
-    data["TXT_CURRENT_P-VALUE"] = p
-    data["TXT_CURRENT_LEN"] = len(current_cut)
-
-    abs_cur = np.abs(dc[start_ind_p:stop_ind_n])
-    dc_cut = dc[start_ind_p+extra_cut:stop_ind_p-extra_cut]
-
-    try:
-        k2, p = scipy.stats.mstats.normaltest(current_cut)
-    except ValueError:
-        k2, p = None, None
-    data["TXT_DIFF_CURRENT_K2"] = k2
-    data["TXT_DIFF_CURRENT_P-VALUE"] = p
-    data["TXT_DIFF_CURRENT_LEN"] = len(current_cut)
+#    extra_cut = 2
+#    current_cut = current[start_ind_p+extra_cut:stop_ind_p-extra_cut]
+#    try:
+#        k2, p = scipy.stats.mstats.normaltest(current_cut)
+#    except ValueError:
+#        k2, p = None, None
+#    data["TXT_CURRENT_K2"] = k2
+#    data["TXT_CURRENT_P-VALUE"] = p
+#    data["TXT_CURRENT_LEN"] = len(current_cut)
+#
+#    abs_cur = np.abs(dc[start_ind_p:stop_ind_n])
+#    dc_cut = dc[start_ind_p+extra_cut:stop_ind_p-extra_cut]
+#
+#    try:
+#        k2, p = scipy.stats.mstats.normaltest(current_cut)
+#    except ValueError:
+#        k2, p = None, None
+#    data["TXT_DIFF_CURRENT_K2"] = k2
+#    data["TXT_DIFF_CURRENT_P-VALUE"] = p
+#    data["TXT_DIFF_CURRENT_LEN"] = len(current_cut)
 
     if np.mean(data["FITS_E"]) > 1000:
         cut = 70
