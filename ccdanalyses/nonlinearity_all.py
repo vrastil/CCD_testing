@@ -36,7 +36,8 @@ def analyze_all(runs=None, runs_dir='/gpfs/mnt/gpfs01/astro/workarea/ccdtest/pro
         out_file += 'all.json'
         try:
             load_raw_data(run_dir=run_dir, out_file=out_file)
-            plot_corrected_w_comp(out_file, out_dir+run)
+            print 'Plotting...'
+            plot_corrected_w_comp(out_file, out_dir+run, title='%s, segment 0')
         except:
             print "Ooops. Something went wrong. Continuing with the next run."
     print "Everything done!"
