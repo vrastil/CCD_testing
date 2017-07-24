@@ -42,7 +42,7 @@ def analyze_all(runs=None, runs_dir='/gpfs/mnt/gpfs01/astro/workarea/ccdtest/pro
             plot_corrected_w_comp(out_file, out_dir+run, title='%s, segment 0' % run)
         except Exception as inst:
             print "Ooops. Something went wrong!"
-            print inst
+            print type(inst), inst
             print "Continuing with the next run."
     print "Everything done!"
 
@@ -575,7 +575,7 @@ def get_txt_info(a_file, data):
 #    data["TXT_CURRENT_P-VALUE"] = p
 #    data["TXT_CURRENT_LEN"] = len(current_cut)
 #
-#    abs_cur = np.abs(dc[start_ind_p:stop_ind_n])
+    abs_cur = np.abs(dc[start_ind_p:stop_ind_n])
 #    dc_cut = dc[start_ind_p+extra_cut:stop_ind_p-extra_cut]
 #
 #    try:
