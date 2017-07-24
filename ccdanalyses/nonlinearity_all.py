@@ -12,8 +12,119 @@ matplotlib.use('Agg')
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import scipy.integrate
+import scipy.stats.mstats
 
-from .file_handling import get_files_in_traverse_dir
+from .file_handling import get_files_in_traverse_dir, chunks, create_dir
+
+def analyze_all(runs=None, runs_dir='/gpfs/mnt/gpfs01/astro/workarea/ccdtest/prod/e2v-CCD/',
+                out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/'):
+    if runs is None:
+        runs = [
+            'E2V-CCD250-281/4785/',
+            'E2V-CCD250-281/4747/',
+            'E2V-CCD250-260/4258/',
+            'E2V-CCD250-260/4256/',
+            'E2V-CCD250-195/4105/',
+            'E2V-CCD250-195/4069/'
+        ]
+
+    for run in runs:
+        print "*** ANALYZING RUN '%s' ***" % run
+        run_dir = runs_dir + run
+        out_file = out_dir + run + 'data/'
+        create_dir(out_file)
+        out_file += 'all.json'
+        try:
+            load_raw_data(run_dir=run_dir, out_file=out_file)
+            plot_corrected_w_comp(out_file, out_dir+run)
+        except:
+            print "Ooops. Something went wrong. Continuing with the next run."
+    print "Everything done!"
+
+def plot_corrected_w_comp(data_file, out_dir, key='TXT_DIFF_CURRENT_LARGE', cut=5, uselower=True, title=''):
+    data = load_json_data(data_file=data_file)
+    fig = plt.figure(figsize=(20, 15))
+    gs0 = gridspec.GridSpec(3, 1, hspace=0.7)
+    xlabel = 'time*current [nC]'
+    ylabel = 'residuals'
+    div_x = 130
+    seg = 0
+    out_dir += 'correct_residuals_weighted.png'
+
+
+    #flat 1
+    flat = 1
+    y = [record["FITS_E"][seg]/1000 for record in data if record['FLAT'] == flat]
+    yerr = [record["FITS_E_STD"][seg]/1000 for record in data if record['FLAT'] == flat]
+    x = [-record['FITS_I*T'] for record in data if record['FLAT'] == flat]
+    suptitle = 'FITS values, flat 1, non-weighted fit'
+    fits_data = Data(x=[x], y=[y], yerr=[yerr], div_x=div_x, suptitle=suptitle, ylabel=ylabel, xlabel=xlabel)
+    fits_data.plot(gs0[0], res=True, fit_w=False)
+    fits_data.suptitle = 'FITS values, flat 1, weighted fit'
+    fits_data.plot(gs0[1], res=True, fit_w=True)
+    del x, y, yerr, fits_data
+
+    # corrected
+    suptitle = 'Removed outliners, weighted fit'
+    x = []
+    y = []
+    yerr = []
+    for record in chunks(data, 2):
+        if uselower:
+            i = 1 if record[0][key] > record[1][key] else 0
+            if record[i][key] < cut:
+                x.append(-record[i]['FITS_I*T'])
+                y.append(record[i]['FITS_E'][seg]/1000)
+                yerr.append(record[i]['FITS_E_STD'][seg]/1000)
+        else:
+            i = 1 if record[0][key] < record[1][key] else 0
+            if record[i][key] > cut:
+                x.append(-record[i]['FITS_I*T'])
+                y.append(record[i]['FITS_E'][seg]/1000)
+                yerr.append(record[i]['FITS_E_STD'][seg]/1000)
+
+    fits_data = Data(x=[x], y=[y], yerr=[yerr], div_x=div_x, suptitle=suptitle, ylabel=ylabel, xlabel=xlabel)
+    fits_data.plot(gs0[2], res=True, fit_w=True)
+    del x, fits_data
+    
+    fig.suptitle(title, y=0.98, size=36)
+    plt.savefig(out_dir)
+    plt.close(fig)
+
+def plot_diff_large(data_file, out_dir, cut=5):
+    data = load_json_data(data_file=data_file)
+    fig = plt.figure(figsize=(20, 15))
+    gs0 = gridspec.GridSpec(2, 1, hspace=0.3)
+    
+    xlabel = 'time*current [nC]'
+    div_x = 150
+    
+#    xlabel = 'time [s]'
+#    div_x = 44
+    
+    seg = 0
+    
+    out_dir += 'large_diff.png'
+    
+    suptitle = 'abs(diff), flat 1'
+    flat = 1
+    x = [-record['FITS_I*T'] for record in data if record['FLAT'] == flat]
+#    x = [record['FITS_EXPTIME'] for record in data if record['FLAT'] == flat]
+    y = [record['TXT_DIFF_CURRENT_LARGE'] for record in data if record['FLAT'] == flat]
+    ylabel = 'Counts (large diff)'
+    fits_data = Data(x=[x], y=[y], div_x=div_x, suptitle=suptitle, ylabel=ylabel, xlabel=xlabel)
+    fits_data.plot(gs0[0], axhline=cut, ylog=True)
+    del y, fits_data
+    
+    suptitle = 'abs(diff), flat 2'
+    flat = 2
+    x = [-record['FITS_I*T'] for record in data if record['FLAT'] == flat]
+#    x = [record['FITS_EXPTIME'] for record in data if record['FLAT'] == flat]
+    y = [record['TXT_DIFF_CURRENT_LARGE'] for record in data if record['FLAT'] == flat]
+    ylabel = 'Counts (large diff)'
+    fits_data = Data(x=[x], y=[y], div_x=div_x, suptitle=suptitle, ylabel=ylabel, xlabel=xlabel)
+    fits_data.plot(gs0[1], axhline=cut, ylog=True)
+    del y, fits_data
 
 def plot_all(data_file='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/E2V-CCD250-281/4785/data/data.json',
              out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/E2V-CCD250-281/4785/',
@@ -127,12 +238,67 @@ def plot_cur_diff(data_file, out_dir, flat=1):
     cur = np.array([-record["FITS_CURRENT"] for record in data if record['FLAT'] == flat])
 
     suptitle = 'TXT diff current'
-#    fits_data = nl.Data(x=[x, x, x], y=[y1, y2, y3], leg=['sigma', 'mean', 'median'],
+#    fits_data = Data(x=[x, x, x], y=[y1, y2, y3], leg=['sigma', 'mean', 'median'],
 #                        div_x=div_x, suptitle=suptitle, xlabel=xlabel)
     fits_data = Data(x=[x, x, x, x], y=[y4, y5, y6, y7], leg=['80', '90', '95', '97'],
                         div_x=div_x, suptitle=suptitle, xlabel=xlabel)
     fits_data.plot(gs0[0], ylog=True)
     del x, fits_data
+
+def plot_normaltest(data_file, out_dir):
+    data = load_json_data(data_file=data_file)
+    fig = plt.figure(figsize=(20, 30))
+    gs0 = gridspec.GridSpec(4, 1, hspace=0.3)
+    
+    xlabel = 'time*current [nC]'
+    div_x = 2300
+    
+#    xlabel = 'time [s]'
+#    div_x = 44
+    
+    seg = 0
+    
+    out_dir += 'normal_test.png'
+    
+    suptitle = 'Normal test, flat 1'
+    flat = 1
+    x = [-record['FITS_I*T'] for record in data if record['FLAT'] == flat and record['TXT_CURRENT_P-VALUE'] is not None]
+#    x = [record['FITS_EXPTIME'] for record in data if record['FLAT'] == flat and record['TXT_CURRENT_K2'] is not None]
+    y = [record['TXT_CURRENT_P-VALUE'] for record in data if record['FLAT'] == flat and record['TXT_CURRENT_P-VALUE'] is not None]
+    ylabel = 'p-value'
+    fits_data = Data(x=[x], y=[y], div_x=div_x, suptitle=suptitle, ylabel=ylabel, xlabel=xlabel)
+    fits_data.plot(gs0[0], axhline=0.05, ylog=True)
+    del y, fits_data
+    
+    suptitle = 'Normal test, flat 2'
+    flat = 2
+    x = [-record['FITS_I*T'] for record in data if record['FLAT'] == flat and record['TXT_CURRENT_P-VALUE'] is not None]
+#    x = [record['FITS_EXPTIME'] for record in data if record['FLAT'] == flat and record['TXT_CURRENT_K2'] is not None]
+    y = [record['TXT_CURRENT_P-VALUE'] for record in data if record['FLAT'] == flat and record['TXT_CURRENT_P-VALUE'] is not None]
+    ylabel = 'p-value'
+    fits_data = Data(x=[x], y=[y], div_x=div_x, suptitle=suptitle, ylabel=ylabel, xlabel=xlabel)
+    fits_data.plot(gs0[1], axhline=0.05, ylog=True)
+    del y, fits_data
+    
+    suptitle = 'Normal test, DIFF, flat 1'
+    flat = 1
+    x = [-record['FITS_I*T'] for record in data if record['FLAT'] == flat and record['TXT_DIFF_CURRENT_P-VALUE'] is not None]
+#    x = [record['FITS_EXPTIME'] for record in data if record['FLAT'] == flat and record['TXT_CURRENT_K2'] is not None]
+    y = [record['TXT_DIFF_CURRENT_P-VALUE'] for record in data if record['FLAT'] == flat and record['TXT_DIFF_CURRENT_P-VALUE'] is not None]
+    ylabel = 'p-value'
+    fits_data = Data(x=[x], y=[y], div_x=div_x, suptitle=suptitle, ylabel=ylabel, xlabel=xlabel)
+    fits_data.plot(gs0[2], axhline=0.05, ylog=True)
+    del y, fits_data
+    
+    suptitle = 'Normal test, DIFF, flat 2'
+    flat = 2
+    x = [-record['FITS_I*T'] for record in data if record['FLAT'] == flat and record['TXT_DIFF_CURRENT_P-VALUE'] is not None]
+#    x = [record['FITS_EXPTIME'] for record in data if record['FLAT'] == flat and record['TXT_CURRENT_K2'] is not None]
+    y = [record['TXT_DIFF_CURRENT_P-VALUE'] for record in data if record['FLAT'] == flat and record['TXT_DIFF_CURRENT_P-VALUE'] is not None]
+    ylabel = 'p-value'
+    fits_data = Data(x=[x], y=[y], div_x=div_x, suptitle=suptitle, ylabel=ylabel, xlabel=xlabel)
+    fits_data.plot(gs0[3], axhline=0.05, ylog=True)
+    del y, fits_data
 
 class Data(object):
     """
@@ -267,9 +433,9 @@ def load_raw_data(run_dir='/gpfs/mnt/gpfs01/astro/workarea/ccdtest/prod/e2v-CCD/
             len(get_files_in_traverse_dir(run_dir + 'flat_acq/', '*_flat?_*.fits')))]
     if load_fits:
         load_fits_files(raw_data, run_dir)
+        get_gains_to_e(raw_data, run_dir)
     if load_txt:
         load_txt_files(raw_data, run_dir)
-        get_gains_to_e(raw_data, run_dir)
     save_json_data(raw_data, out_file)
 
 def save_json_data(raw_data, out_file):
@@ -394,7 +560,33 @@ def get_txt_info(a_file, data):
     data["TXT_I*dt"] = scipy.integrate.simps(
         current[start_ind_n:stop_ind_p], time[start_ind_n:stop_ind_p])
 
+    extra_cut = 2
+    current_cut = current[start_ind_p+extra_cut:stop_ind_p-extra_cut]
+    try:
+        k2, p = scipy.stats.mstats.normaltest(current_cut)
+    except ValueError:
+        k2, p = None, None
+    data["TXT_CURRENT_K2"] = k2
+    data["TXT_CURRENT_P-VALUE"] = p
+    data["TXT_CURRENT_LEN"] = len(current_cut)
+
     abs_cur = np.abs(dc[start_ind_p:stop_ind_n])
+    dc_cut = dc[start_ind_p+extra_cut:stop_ind_p-extra_cut]
+
+    try:
+        k2, p = scipy.stats.mstats.normaltest(current_cut)
+    except ValueError:
+        k2, p = None, None
+    data["TXT_DIFF_CURRENT_K2"] = k2
+    data["TXT_DIFF_CURRENT_P-VALUE"] = p
+    data["TXT_DIFF_CURRENT_LEN"] = len(current_cut)
+
+    if np.mean(data["FITS_E"]) > 1000:
+        cut = 70
+    else:
+        cut = 700
+    data["TXT_DIFF_CURRENT_LARGE"] = len(np.where(abs_cur > cut)[0])
+
     data["TXT_DIFF_CURRENT_MEAN"] = np.mean(abs_cur)
     data["TXT_DIFF_CURRENT2_MEAN"] = (np.mean(abs_cur*abs_cur))**(1/2.)
     data["TXT_DIFF_CURRENT3_MEAN"] = (np.mean(abs_cur*abs_cur*abs_cur))**(1/3.)
