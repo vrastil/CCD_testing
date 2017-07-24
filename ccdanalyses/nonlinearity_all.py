@@ -40,8 +40,10 @@ def analyze_all(runs=None, runs_dir='/gpfs/mnt/gpfs01/astro/workarea/ccdtest/pro
                 load_raw_data(run_dir=run_dir, out_file=out_file)
             print 'Plotting...'
             plot_corrected_w_comp(out_file, out_dir+run, title='%s, segment 0' % run)
-        except:
-            print "Ooops. Something went wrong. Continuing with the next run."
+        except Exception as inst:
+            print "Ooops. Something went wrong!"
+            print inst
+            print "Continuing with the next run."
     print "Everything done!"
 
 def plot_corrected_w_comp(data_file, out_dir, key='TXT_DIFF_CURRENT_LARGE', cut=5, uselower=True, title=''):
