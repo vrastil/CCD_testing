@@ -188,10 +188,10 @@ def qe_step(run, db='Prod', site='BNL', prodServer='Dev',
         print 'Plotting QE at wavelength %i nm' % wavelength
         data = dh.load_qe(img, wavelength)
         np.save(out_dir+'qe_data/%s_qe_%inm' % (run, wavelength), data)
-        np.savetxt(out_dir+'qe_data/%s_qe_%inm' % (run, wavelength), data)
+        np.savetxt(out_dir+'qe_data/%s_qe_%inm.txt' % (run, wavelength), data)
         vmin = np.percentile(data, 10)
         vmax = np.percentile(data, 90)
-        ph.plot_raft_map(data, img, title + '_map_QE_' + wavelength + 'nm_', out_dir, vmin, vmax)
+        ph.plot_raft_map(data, img, title + '_map_QE_' + str(wavelength) + 'nm_', out_dir, vmin, vmax)
         del data
 
 
