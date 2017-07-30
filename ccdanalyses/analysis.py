@@ -191,7 +191,7 @@ def qe_step(run, db='Prod', site='BNL', prodServer='Dev',
         np.savetxt(out_dir+'qe_data/%s_qe_%inm.txt' % (run, wavelength), data)
         vmin = np.percentile(data, 10)
         vmax = np.percentile(data, 90)
-        ph.plot_raft_map(data, img, title + '_map_QE_' + str(wavelength) + 'nm_', out_dir, vmin, vmax)
+        ph.plot_raft_map(data, img, title + '_map_QE_' + str(wavelength) + 'nm', out_dir, vmin, vmax)
         del data
 
 
