@@ -22,7 +22,8 @@ KEY_SUBDIR = {
     "system_noise" : "read_noise_raft",
     "read_noise" : "read_noise_raft",
     "total_noise" : "read_noise_raft",
-    "gain" : "fe55_raft_analysis"
+    "gain" : "fe55_raft_analysis",
+    "QE" : "qe_raft_analysis"
     }
 
 CTI_KEYS = ["cti_high_parallel", "cti_low_serial", "cti_high_serial", "cti_low_parallel"]

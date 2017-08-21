@@ -80,12 +80,23 @@ def load_data(img, data_key):
             data.append(d[data_key])
         except:
             return None
+        del d
 
     data = np.array(data)
     if data.any():
         return data
     else:
         return None
+
+
+def load_qe(img, wavelength):
+    """ return two-dimensional numpy array """
+    data = []
+    for f in img:
+        d = fits.getdata(f.file)
+        data.append([x[i] for x in d for i in range(1,17) if np.isclose(x[0], wavelength, atol=5)])
+        del d
+    return np.array(data)
 
 def load_noises_e(runs):
     """ for list of runs return list of noises in e- """
