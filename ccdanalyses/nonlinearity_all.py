@@ -40,15 +40,48 @@ def analyze_all(runs=None, runs_dir='/gpfs/mnt/gpfs01/astro/workarea/ccdtest/pro
                 load_raw_data(run_dir=run_dir, out_file=out_file)
             print 'Plotting...'
             plot_corrected_w_comp(out_file, out_dir+run, title='%s, segment 0' % run)
+            plot_cur(out_file, out_dir+run,  title='%s, segment 0' % run)
+            plot_N_cut(out_file, out_dir+run, title='%s, segment 0' % run)
         except Exception as inst:
             print "Ooops. Something went wrong!"
             print type(inst), inst
             print "Continuing with the next run."
     print "Everything done!"
 
-def plot_N_cut(data_file, out_dir, flat=1, title=''):
+def plot_N_cut(data_file, out_dir, title='', key="TXT_DIFF_CURRENT_LARGE_DETAIL", uselower=True):
+    from matplotlib.colors import SymLogNorm
     data = load_json_data(data_file=data_file)
-    N_cut = np.array([record["TXT_DIFF_CURRENT_LARGE_DETAIL"] for record in data if record['FLAT'] == flat])
+    N_cut = []
+    for record in chunks(data, 2):
+        if uselower:
+            i = 1 if record[0][key] > record[1][key] else 0
+        else:
+            i = 1 if record[0][key] < record[1][key] else 0
+        N_cut.append(record[i])
+    N_cut = np.array(N_cut)
+
+    fig = plt.figure(figsize=(20, 20))
+    gs = gridspec.GridSpec(1, 15, wspace=0.5)
+    ax = plt.subplot(gs[0, : -1]) #
+
+    ax.xaxis.set_tick_params(labelsize=18)
+    ax.yaxis.set_tick_params(labelsize=18)
+    ax.set_ylabel(r"$cut_{diff}$ [nA]", fontsize=24)
+    ax.set_xlabel(r"$time$ [s]", fontsize=24)
+
+    ax.axhline(y=0.325, c='k', ls='--', lw=5.0)
+    cbar_ax = plt.subplot(gs[0, -1]) #
+    extent = [data[0]["FITS_EXPTIME"], data[-1]["FITS_EXPTIME"],
+             data[0]["TXT_DIFF_CURRENT_LARGE_DETAIL_CUTS"][-1],
+             0]
+             # data[0]["TXT_DIFF_CURRENT_LARGE_DETAIL_CUTS"][0]]
+    im = ax.imshow(N_cut.T, interpolation='nearest',
+                   norm=SymLogNorm(linthresh=10, linscale=3, vmin=0, vmax=1000),
+                   aspect='auto', extent=extent)
+    cbar = fig.colorbar(im, cax=cbar_ax, ticks=[0,5,10,100, 1000])
+    cbar.ax.set_yticklabels(['0', '5', '10', '100', '> 1000'])
+    fig.suptitle(title, y=0.98, size=36)
+    plt.savefig(out_dir)
 
 def plot_cur(data_file, out_dir, flat=1, title=''):
     data = load_json_data(data_file=data_file)
@@ -125,41 +158,6 @@ def plot_corrected_w_comp(data_file, out_dir, key='TXT_DIFF_CURRENT_LARGE', cut=
     fig.suptitle(title, y=0.98, size=36)
     plt.savefig(out_dir)
     plt.close(fig)
-
-def plot_diff_large(data_file, out_dir, cut=5):
-    data = load_json_data(data_file=data_file)
-    fig = plt.figure(figsize=(20, 15))
-    gs0 = gridspec.GridSpec(2, 1, hspace=0.3)
-    
-    xlabel = 'time*current [nC]'
-    div_x = 150
-    
-#    xlabel = 'time [s]'
-#    div_x = 44
-    
-    seg = 0
-    
-    out_dir += 'large_diff.png'
-    
-    suptitle = 'abs(diff), flat 1'
-    flat = 1
-    x = [-record['FITS_I*T'] for record in data if record['FLAT'] == flat]
-#    x = [record['FITS_EXPTIME'] for record in data if record['FLAT'] == flat]
-    y = [record['TXT_DIFF_CURRENT_LARGE'] for record in data if record['FLAT'] == flat]
-    ylabel = 'Counts (large diff)'
-    fits_data = Data(x=[x], y=[y], div_x=div_x, suptitle=suptitle, ylabel=ylabel, xlabel=xlabel)
-    fits_data.plot(gs0[0], axhline=cut, ylog=True)
-    del y, fits_data
-    
-    suptitle = 'abs(diff), flat 2'
-    flat = 2
-    x = [-record['FITS_I*T'] for record in data if record['FLAT'] == flat]
-#    x = [record['FITS_EXPTIME'] for record in data if record['FLAT'] == flat]
-    y = [record['TXT_DIFF_CURRENT_LARGE'] for record in data if record['FLAT'] == flat]
-    ylabel = 'Counts (large diff)'
-    fits_data = Data(x=[x], y=[y], div_x=div_x, suptitle=suptitle, ylabel=ylabel, xlabel=xlabel)
-    fits_data.plot(gs0[1], axhline=cut, ylog=True)
-    del y, fits_data
 
 def plot_all(data_file='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/E2V-CCD250-281/4785/data/data.json',
              out_dir='/gpfs/mnt/gpfs01/astro/www/vrastil/TS3_Data_Analysis/nonlinearity/E2V-CCD250-281/4785/',
@@ -617,13 +615,14 @@ def get_txt_info(a_file, data):
 #    data["TXT_DIFF_CURRENT_LEN"] = len(current_cut)
 
     abs_diff_PD = np.abs(np.diff(current)[start_ind_p:stop_ind_n])
-    if np.mean(data["FITS_E"]) > 1000:
-        cut = 0.35
-    else:
-        cut = 3.5
+    # if np.mean(data["FITS_E"]) > 1000:
+    #     cut = 0.35
+    # else:
+    #     cut = 3.5
+    cur = 0.35
     data["TXT_DIFF_CURRENT_LARGE"] = len(np.where(abs_diff_PD > cut)[0])
     cuts = np.arange(0.05, 1.05, 0.05)
-    data["TXT_DIFF_CURRENT_LARGE_DETAIL"] = cuts
+    data["TXT_DIFF_CURRENT_LARGE_DETAIL_CUTS"] = cuts
     data["TXT_DIFF_CURRENT_LARGE_DETAIL"] = []
     for cut in cuts:
         data["TXT_DIFF_CURRENT_LARGE_DETAIL"].append(len(np.where(abs_diff_PD > cut)[0]))
