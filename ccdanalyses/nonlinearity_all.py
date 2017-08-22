@@ -46,6 +46,10 @@ def analyze_all(runs=None, runs_dir='/gpfs/mnt/gpfs01/astro/workarea/ccdtest/pro
             print "Continuing with the next run."
     print "Everything done!"
 
+def plot_N_cut(data_file, out_dir, flat=1, title=''):
+    data = load_json_data(data_file=data_file)
+    N_cut = np.array([record["TXT_DIFF_CURRENT_LARGE_DETAIL"] for record in data if record['FLAT'] == flat])
+
 def plot_cur(data_file, out_dir, flat=1, title=''):
     data = load_json_data(data_file=data_file)
     fig = plt.figure(figsize=(20, 15))
@@ -619,9 +623,10 @@ def get_txt_info(a_file, data):
         cut = 3.5
     data["TXT_DIFF_CURRENT_LARGE"] = len(np.where(abs_diff_PD > cut)[0])
     cuts = np.arange(0.05, 1.05, 0.05)
+    data["TXT_DIFF_CURRENT_LARGE_DETAIL"] = cuts
     data["TXT_DIFF_CURRENT_LARGE_DETAIL"] = []
     for cut in cuts:
-        data["TXT_DIFF_CURRENT_LARGE_DETAIL"].append((cut, len(np.where(abs_diff_PD > cut)[0])))
+        data["TXT_DIFF_CURRENT_LARGE_DETAIL"].append(len(np.where(abs_diff_PD > cut)[0]))
 
     data["TXT_DIFF_CURRENT_MEAN"] = np.mean(abs_cur)
     data["TXT_DIFF_CURRENT2_MEAN"] = (np.mean(abs_cur*abs_cur))**(1/2.)
