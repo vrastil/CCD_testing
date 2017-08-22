@@ -46,6 +46,32 @@ def analyze_all(runs=None, runs_dir='/gpfs/mnt/gpfs01/astro/workarea/ccdtest/pro
             print "Continuing with the next run."
     print "Everything done!"
 
+def plot_cur(data_file, out_dir, flat=1, title=''):
+    data = load_json_data(data_file=data_file)
+    fig = plt.figure(figsize=(20, 15))
+    gs0 = gridspec.GridSpec(2, 1, hspace=0.3)
+    out_dir += 'current.png'
+    xlabel = 'time [s]'
+    x = [record['FITS_EXPTIME'] for record in data if record['FLAT'] == flat]
+    div_x = 10
+
+    cur = np.array([record["TXT_CURRENT_MEAN-+"] for record in data if record['FLAT'] == flat])
+    cur_std = np.array([-record["TXT_CURRENT_SIGMA-+"] for record in data if record['FLAT'] == flat])
+
+    ylabel = 'current [nA]'
+    fits_data = Data(x=[x], y=[cur], div_x=div_x, xlabel=xlabel, ylabel=ylabel)
+    fits_data.plot(gs0[0])
+    del cur, fits_data
+
+    ylabel = 'current std [nA]'
+    fits_data = Data(x=[x], y=[cur_std], div_x=div_x, xlabel=xlabel, ylabel=ylabel)
+    fits_data.plot(gs0[1])
+    del x, cur_std, fits_data
+
+    fig.suptitle(title, y=0.98, size=36)
+    plt.savefig(out_dir)
+    plt.close(fig)
+
 def plot_corrected_w_comp(data_file, out_dir, key='TXT_DIFF_CURRENT_LARGE', cut=5, uselower=True, title=''):
     data = load_json_data(data_file=data_file)
     fig = plt.figure(figsize=(20, 15))
@@ -545,7 +571,7 @@ def get_txt_info(a_file, data):
     stop_ind_p = np.where(dc == stop)[-1][0] + 1
     stop_ind_n = np.where(dc == stop)[-1][0]
 
-    data["TXT_EXPTIME"] = dtime[start_ind_n] - dtime[stop_ind_n]
+    data["TXT_EXPTIME"] = dtime[stop_ind_n] - dtime[start_ind_n]
     data["TXT_START"] = dtime[start_ind_n]
     data["TXT_STOP"] = dtime[stop_ind_n]
     data["TXT_START+"] = time[start_ind_p]
@@ -586,11 +612,16 @@ def get_txt_info(a_file, data):
 #    data["TXT_DIFF_CURRENT_P-VALUE"] = p
 #    data["TXT_DIFF_CURRENT_LEN"] = len(current_cut)
 
+    abs_diff_PD = np.abs(np.diff(current)[start_ind_p:stop_ind_n])
     if np.mean(data["FITS_E"]) > 1000:
-        cut = 70
+        cut = 0.35
     else:
-        cut = 700
-    data["TXT_DIFF_CURRENT_LARGE"] = len(np.where(abs_cur > cut)[0])
+        cut = 3.5
+    data["TXT_DIFF_CURRENT_LARGE"] = len(np.where(abs_diff_PD > cut)[0])
+    cuts = np.arange(0.05, 1.05, 0.05)
+    data["TXT_DIFF_CURRENT_LARGE_DETAIL"] = []
+    for cut in cuts:
+        data["TXT_DIFF_CURRENT_LARGE_DETAIL"].append((cut, len(np.where(abs_diff_PD > cut)[0])))
 
     data["TXT_DIFF_CURRENT_MEAN"] = np.mean(abs_cur)
     data["TXT_DIFF_CURRENT2_MEAN"] = (np.mean(abs_cur*abs_cur))**(1/2.)
