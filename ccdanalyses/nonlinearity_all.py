@@ -71,10 +71,10 @@ def plot_N_cut(data_file, out_dir, title='', key="TXT_DIFF_CURRENT_LARGE_DETAIL"
 
     ax.axhline(y=0.325, c='k', ls='--', lw=5.0)
     cbar_ax = plt.subplot(gs[0, -1]) #
+    cuts = data[0]["TXT_DIFF_CURRENT_LARGE_DETAIL_CUTS"]
     extent = [data[0]["FITS_EXPTIME"], data[-1]["FITS_EXPTIME"],
-             data[0]["TXT_DIFF_CURRENT_LARGE_DETAIL_CUTS"][-1],
-             0]
-             # data[0]["TXT_DIFF_CURRENT_LARGE_DETAIL_CUTS"][0]]
+              cuts[-1], cuts[0] - (cuts[-1] - cuts[0])/len(cuts)]
+
     im = ax.imshow(N_cut.T, interpolation='nearest',
                    norm=SymLogNorm(linthresh=10, linscale=3, vmin=0, vmax=1000),
                    aspect='auto', extent=extent)
@@ -619,9 +619,9 @@ def get_txt_info(a_file, data):
     #     cut = 0.35
     # else:
     #     cut = 3.5
-    cur = 0.35
+    cut = 1.25
     data["TXT_DIFF_CURRENT_LARGE"] = len(np.where(abs_diff_PD > cut)[0])
-    cuts = np.arange(0.05, 1.05, 0.05)
+    cuts = np.arange(0.55, 1.55, 0.05)
     data["TXT_DIFF_CURRENT_LARGE_DETAIL_CUTS"] = cuts
     data["TXT_DIFF_CURRENT_LARGE_DETAIL"] = []
     for cut in cuts:
