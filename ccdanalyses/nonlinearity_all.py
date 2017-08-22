@@ -89,7 +89,7 @@ def plot_N_cut(data_file, out_dir, title='', key="TXT_DIFF_CURRENT_LARGE_DETAIL"
                    aspect='auto', extent=extent)
     cbar = fig.colorbar(im, cax=cbar_ax, ticks=[0,5,10,100, 1000])
     cbar.ax.set_yticklabels(['0', '5', '10', '100', '> 1000'])
-    ax.set_title("Number of 'Bad Points' for different cuts", x=1., y=1.05, fontsize=30)
+    ax.set_title("Number of 'Bad Points' for different cuts", x=0.1, y=1.0, fontsize=30)
     fig.suptitle(title, y=0.98, size=36)
     plt.savefig(out_dir)
 
