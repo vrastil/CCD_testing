@@ -21,12 +21,17 @@ def analyze_all(runs=None, runs_dir='/gpfs/mnt/gpfs01/astro/workarea/ccdtest/pro
                 load_data=True):
     if runs is None:
         runs = [
-            'E2V-CCD250-281/4785/',
+            'E2V-CCD250-134/4368/',
+            'E2V-CCD250-136/4419/',
+            'E2V-CCD250-137/4884/',
+            'E2V-CCD250-179/4611/',
+            'E2V-CCD250-194/4298/',
+            'E2V-CCD250-194/4331/',
+            'E2V-CCD250-265/4530/',
+            'E2V-CCD250-266/4479/',
+            'E2V-CCD250-267/4821/',
             'E2V-CCD250-281/4747/',
-            'E2V-CCD250-260/4258/',
-            'E2V-CCD250-260/4256/',
-            'E2V-CCD250-195/4105/',
-            'E2V-CCD250-195/4069/'
+            'E2V-CCD250-281/4785/'
         ]
 
     for run in runs:
@@ -64,16 +69,16 @@ def plot_N_cut(data_file, out_dir, title='', key="TXT_DIFF_CURRENT_LARGE_DETAIL"
         N_cut.append(cuts_tmp)
     N_cut = np.array(N_cut)
 
-    fig = plt.figure(figsize=(20, 20))
+    fig = plt.figure(figsize=(15, 15))
     gs = gridspec.GridSpec(1, 15, wspace=0.5)
     ax = plt.subplot(gs[0, : -1]) #
 
     ax.xaxis.set_tick_params(labelsize=18)
     ax.yaxis.set_tick_params(labelsize=18)
-    ax.set_ylabel(r"$cut_{diff}$ [nA]", fontsize=24)
-    ax.set_xlabel(r"$time$ [s]", fontsize=24)
+    ax.set_ylabel("cut_diff [nA]", fontsize=24)
+    ax.set_xlabel("time [s]", fontsize=24)
 
-    ax.axhline(y=0.325, c='k', ls='--', lw=5.0)
+    ax.axhline(y=1.225, c='k', ls='--', lw=5.0)
     cbar_ax = plt.subplot(gs[0, -1]) #
     cuts = data[0]["TXT_DIFF_CURRENT_LARGE_DETAIL_CUTS"]
     extent = [data[0]["FITS_EXPTIME"], data[-1]["FITS_EXPTIME"],
@@ -84,6 +89,7 @@ def plot_N_cut(data_file, out_dir, title='', key="TXT_DIFF_CURRENT_LARGE_DETAIL"
                    aspect='auto', extent=extent)
     cbar = fig.colorbar(im, cax=cbar_ax, ticks=[0,5,10,100, 1000])
     cbar.ax.set_yticklabels(['0', '5', '10', '100', '> 1000'])
+    ax.set_title("Number of 'Bad Points' for different cuts", x=1., y=1.05, fontsize=30)
     fig.suptitle(title, y=0.98, size=36)
     plt.savefig(out_dir)
 
@@ -625,7 +631,7 @@ def get_txt_info(a_file, data):
     #     cut = 3.5
     cut = 1.25
     data["TXT_DIFF_CURRENT_LARGE"] = len(np.where(abs_diff_PD > cut)[0])
-    cuts = np.arange(0.55, 1.55, 0.05)
+    cuts = np.arange(0.05, 2.05, 0.1)
     data["TXT_DIFF_CURRENT_LARGE_DETAIL_CUTS"] = cuts
     data["TXT_DIFF_CURRENT_LARGE_DETAIL"] = []
     for cut in cuts:
