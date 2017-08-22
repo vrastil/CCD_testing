@@ -50,6 +50,7 @@ def analyze_all(runs=None, runs_dir='/gpfs/mnt/gpfs01/astro/workarea/ccdtest/pro
 
 def plot_N_cut(data_file, out_dir, title='', key="TXT_DIFF_CURRENT_LARGE_DETAIL", uselower=True):
     from matplotlib.colors import SymLogNorm
+    out_dir += 'cuts.png'
     data = load_json_data(data_file=data_file)
     N_cut = []
     for record in chunks(data, 2):
