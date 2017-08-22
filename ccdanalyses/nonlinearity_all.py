@@ -53,10 +53,10 @@ def plot_cur(data_file, out_dir, flat=1, title=''):
     out_dir += 'current.png'
     xlabel = 'time [s]'
     x = [record['FITS_EXPTIME'] for record in data if record['FLAT'] == flat]
-    div_x = 10
+    div_x = 4
 
     cur = np.array([record["TXT_CURRENT_MEAN-+"] for record in data if record['FLAT'] == flat])
-    cur_std = np.array([-record["TXT_CURRENT_SIGMA-+"] for record in data if record['FLAT'] == flat])
+    cur_std = np.array([record["TXT_CURRENT_SIGMA-+"] for record in data if record['FLAT'] == flat])
 
     ylabel = 'current [nA]'
     fits_data = Data(x=[x], y=[cur], div_x=div_x, xlabel=xlabel, ylabel=ylabel)
@@ -347,7 +347,7 @@ class Data(object):
         self.ylabel = ylabel # one string
         self.info = info # one string
 
-    def plot(self, subplot_spec, axhline=None, fit=False, res=False, yerr=False, fit_w=False, ylog=False):
+    def plot(self, subplot_spec, axhline=None, axvline=None, fit=False, res=False, yerr=False, fit_w=False, ylog=False):
         gs1 = gridspec.GridSpecFromSubplotSpec(
                 1, 2, wspace=0., subplot_spec=subplot_spec)
         ax1 = plt.subplot(gs1[0])
@@ -398,16 +398,16 @@ class Data(object):
         if axhline is not None:
             ax1.axhline(y=axhline, color='r', linestyle='--')
             ax2.axhline(y=axhline, color='r', linestyle='--')
-        if fit or res:
+        if fit or res or axvline == 'auto':
             lin_low = 1
             lin_high = 90
 
             dy = np.array(self.y[0])
-            dyerr = np.array(self.yerr[0])
             dx = np.array(self.x[0])
             cut1 = np.where(dy > lin_low)[0]
             cut2 = np.where(dy[cut1] < lin_high)[0]
             if fit_w:
+                dyerr = np.array(self.yerr[0])
                 f1 = np.poly1d(np.polyfit(dx[cut1][cut2], dy[cut1][cut2], 1, w=1/dyerr[cut1][cut2]))
             else:
                 f1 = np.poly1d(np.polyfit(dx[cut1][cut2], dy[cut1][cut2], 1))
@@ -440,7 +440,7 @@ class Data(object):
             ax1.axhline(y=-0.02, color='b', linestyle='--')
             ax2.axhline(y=0.02, color='b', linestyle='--')
             ax2.axhline(y=-0.02, color='b', linestyle='--')
-
+        if res or axvline is not None:
             ax1.axvline(x=xlin_low1, color='b', linestyle='--')
             ax1.axvline(x=xlin_high1, color='b', linestyle='--')
             ax2.axvline(x=xlin_low1, color='b', linestyle='--')
