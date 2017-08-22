@@ -53,11 +53,14 @@ def plot_N_cut(data_file, out_dir, title='', key="TXT_DIFF_CURRENT_LARGE_DETAIL"
     data = load_json_data(data_file=data_file)
     N_cut = []
     for record in chunks(data, 2):
-        if uselower:
-            i = 1 if record[0][key] > record[1][key] else 0
-        else:
-            i = 1 if record[0][key] < record[1][key] else 0
-        N_cut.append(record[i])
+        cuts_tmp = []
+        for j in xrange(len(record[0][key])):
+            if uselower:
+                i = 1 if record[0][key][j] > record[1][key][j] else 0
+            else:
+                i = 1 if record[0][key][j] < record[1][key][j] else 0
+            cuts_tmp.append(record[i][key][j])
+        N_cut.append(cuts_tmp)
     N_cut = np.array(N_cut)
 
     fig = plt.figure(figsize=(20, 20))
